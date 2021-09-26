@@ -11,7 +11,7 @@ void Button::Render()
 		Renderer::renderTexture(m_Frame, m_NormalPosition, m_PixelDimensions, { 0.0f, 0.0f, 0.0f });
 
 	Renderer::renderTexture(m_Frame, m_Position, m_PixelDimensions);
-	Renderer::drawText(m_Text, m_TextPosition, 2, TextColor);
+	Renderer::drawText(m_Text, m_TextPosition, m_TextSize, TextColor);
 }
 
 bool Button::onMousePressed(const vec2& position)
@@ -49,21 +49,21 @@ void Button::setText(const std::string& text, TextAnchorFlags flags)
 	m_Text = text;
 	m_Flags = flags;
 
-	uint currentTextSize = Font::getTextWidth(m_Text, 2);
+	uint currentTextSize = Font::getTextWidth(m_Text, m_TextSize);
 
 	m_TextPosition = m_Position;
 
 	if (m_Flags & Center)
 	{
 		m_TextPosition.x = m_Position.x + m_Size.x / 2.0f - currentTextSize / 2.0f;
-		m_TextPosition.y = m_Position.y + m_Size.y / 2.0f - Font::getGlyphHeight();
+		m_TextPosition.y = m_Position.y + m_Size.y / 2.0f - (Font::getGlyphHeight() * m_TextSize) / 2.0f;
 	}
 
 	if (m_Flags & Bottom)
 		m_TextPosition.y = m_Position.y + Font::getGlyphHeight();
 
 	else if (m_Flags & Top)
-		m_TextPosition.y = m_Position.y + m_Size.y - Font::getGlyphHeight() * 2.0f;
+		m_TextPosition.y = m_Position.y + m_Size.y - (Font::getGlyphHeight() * m_TextSize);
 
 	if (m_Flags & Left)
 		m_TextPosition.x = m_Position.x;

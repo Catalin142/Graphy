@@ -10,12 +10,15 @@ class Node;
 
 enum class GraphType
 {
+	None,
 	Oriented,
 	Unoriented
 };
 
 class Graph
 {
+	friend class Editor;
+
 public:
 	Graph(GraphType type);
 	~Graph() = default;
@@ -29,8 +32,6 @@ private:
 	std::vector<std::shared_ptr<Node>>  m_Nodes;
 	std::shared_ptr<Node> m_SelectedNode = nullptr;
 
-	std::shared_ptr<Texture> m_ThrashBin;
-	std::shared_ptr<Texture> m_DeleteSign;
 	std::shared_ptr<InputBox> m_InputBox;
 
 	int m_Matrix[40][40]{ 0 };
@@ -42,12 +43,7 @@ private:
 	GraphType m_Type;
 	vec2 m_BufferDim;
 
-	vec3 Black = { 0.0f, 0.0f, 0.0f };
-
-	int m_LineOffset = 55.0f;
-
-	vec2 m_ThrashBinSize;
-	vec2 m_ThrashBinPos;
+	std::shared_ptr<Texture> m_DeleteSign;
 
 	std::vector<Link> m_Links;
 	int m_DrawLink = -1;

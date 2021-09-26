@@ -52,11 +52,12 @@ void TextBox::setPosition(int flags)
 
 // Ca sa fie putin mai rapid
 // Iau fiecare rand din text ii gasesc pozitia si tot ce trebe si dupa il adaug in vector si dupa randez in functia de mai sus  :)
-void TextBox::setText(const std::string& text, int flags, const vec3& color)
+void TextBox::setText(const std::string& text, int flags, const vec3& color, bool clear)
 {
 	vec2 dim = { m_Width, m_Height };
 
-	m_SubStrings.clear();
+	if (clear)
+		m_SubStrings.clear();
 
 	m_Text = text;
 
@@ -86,7 +87,7 @@ void TextBox::setText(const std::string& text, int flags, const vec3& color)
 	}
 
 	if (m_TextLayout.m_Flags & Bottom)
-		startintYposition = m_Position.y + (m_TextLayout.m_Rows - 1) * Font::getGlyphHeight() * m_TextLayout.m_TextSize;
+		startintYposition = m_Position.y + (m_TextLayout.m_Rows - 1) * Font::getGlyphHeight();
 
 	if (m_TextLayout.m_Flags & Top)
 		startintYposition = m_Position.y + dim.y - Font::getGlyphHeight() * m_TextLayout.m_TextSize;
@@ -98,12 +99,22 @@ void TextBox::setText(const std::string& text, int flags, const vec3& color)
 
 		int nCharacters = 0;
 		int nTextWidth = 0;
+
+		bool full = false;
 		while (nTextWidth < dim.x - (m_xOffset * 2))
 		{
 			if (nCharacters >= totalCharacters)
 				break;
-
+			
 			auto c = *(m_Text.begin() + nTotalInsertedCharacters + nCharacters);
+
+			if (c == '\n')
+			{
+				m_TextLayout.m_Rows++;
+				nCharacters++;
+				
+				break;
+			}
 
 			currentString += c;
 			if (c == ' ')
@@ -111,7 +122,21 @@ void TextBox::setText(const std::string& text, int flags, const vec3& color)
 			else nTextWidth += Font::getGlyphWidth(c) * m_TextLayout.m_TextSize + 1;
 
 			nCharacters++;
+
+			if (nTextWidth >= dim.x - (m_xOffset * 2) - 1)
+				full = true;
 		}
+
+		if (!currentString.empty() && full)
+		{
+			int index = currentString.find_last_of(' ');
+			if (index != -1)
+			{
+				nCharacters = nCharacters - (currentString.size() - (index + 1));
+				currentString.erase(currentString.begin() + index, currentString.end());
+			}
+		}
+
 
 		vec2 Pos = m_Position;
 

@@ -32,5 +32,5 @@ private:
 	vec2 m_SpritePixelSize = vec2(6.0f, 6.0f);
 
 	vec2 m_BufferDim;
-	vec2 m_NumeleLuSefuPos;
+	vec2 m_NumeleMeuPos;
 };

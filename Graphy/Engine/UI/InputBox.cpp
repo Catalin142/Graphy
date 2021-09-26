@@ -43,10 +43,11 @@ bool InputBox::onKeyDown(int code)
 			}
 		}
 
-		m_TextBox->setText(m_Buffer, m_Flags, m_TextBox->m_TextLayout.m_Color );
+		m_TextBox->setText(m_Buffer, m_Flags, m_TextBox->m_TextLayout.m_Color);
 		return true;
-
 	}
+	else Input::blockInput(false);
+
 	return false;
 }
 

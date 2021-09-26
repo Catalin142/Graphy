@@ -22,9 +22,9 @@ void MainMenu::onAttach()
     m_MascotaPosition.x += m_Logo->getWidth() * m_SpritePixelSize.x + 20.0f;
 
     m_BufferDim = { (float)Application::Get()->getBuffer()->getWidth(), (float)Application::Get()->getBuffer()->getHeight() };
-    m_NumeleLuSefuPos = m_BufferDim;
-    m_NumeleLuSefuPos.y = 0;
-    m_NumeleLuSefuPos.x -= Font::getTextWidth("Popa Catalin", 2) + 10.0f;
+    m_NumeleMeuPos = m_BufferDim;
+    m_NumeleMeuPos.y = 0;
+    m_NumeleMeuPos.x -= Font::getTextWidth("Popa Catalin", 2) + 10.0f;
 
     m_GraphButton = std::make_shared<Button>(m_ButtonFrame, vec2(85.0f, 140.0f), vec2(200.0f, 30.0f));
     m_GraphButton->setText("Creeaza graf", Center);
@@ -50,7 +50,7 @@ void MainMenu::onUpdate(float deltaTime)
     Renderer::renderTexture(m_Logo, m_LogoPosition, m_SpritePixelSize);
     m_Mascota->Render(m_MascotaPosition, m_SpritePixelSize);
 
-    Renderer::drawText("Popa Catalin", m_NumeleLuSefuPos, 2.0f, vec3(0.0f, 0.0f, 0.0f));
+    Renderer::drawText("Popa Catalin", m_NumeleMeuPos, 2.0f, vec3(0.0f, 0.0f, 0.0f));
     Renderer::drawText("V 1.0", { 3.0f, 0.0f }, 2.0f, vec3(0.0f, 0.0f, 0.0f));
 
     m_GraphButton->Render();
@@ -86,11 +86,4 @@ bool MainMenu::onEvent(Event& ev)
 
         return false;
     }
-
-    /*else if (ev.getType() == EventType::KeyPressed)
-    {
-        if (m_InputBox->onKeyDown(static_cast<KeyPressedEvent&>(ev).getKeyCode()))
-            return true;
-    }*/
-
 }

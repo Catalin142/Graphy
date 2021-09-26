@@ -6,6 +6,7 @@
 class Node
 {
 	friend class Graph;
+	friend class Editor;
 
 public:
 	Node(int id, const std::string& number, const vec2& position, int radius);

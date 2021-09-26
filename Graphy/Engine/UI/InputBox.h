@@ -24,7 +24,7 @@ public:
 
 	void setTextSize(int size) { m_TextBox->setTextSize(size); }
 	void setTextAnchor(int flag) { m_Flags = flag; }
-	void setText(const std::string& text) { m_TextBox->setText(text, m_Flags, m_TextBox->m_TextLayout.m_Color); }
+	void setText(const std::string& text) { m_TextBox->setText(text, m_Flags, m_TextBox->m_TextLayout.m_Color); m_Buffer = text; }
 	void setCharacterLimit(int l) { m_CharacterLimit = l; }
 	void setCharacterType(CharacterType type) { m_ChType = int(type); }
 

@@ -1,0 +1,93 @@
+[Orientat]
+Def:
+Graf orientat:
+Se numeste graf orientat sau digraf o pereche ordonata de multimi notata G=[V, U], unde:
+   V este o multime finita si nevida ale carei elemente se numesc noduri sau varfuri.
+   U este o multime de perechi ordonate de elemente distincte din V ale carei elemente se numesc arce.
+
+Def:
+Grad:
+   Se numeste grad exterior al nodului x, numarul arcelor de forma [x,y] [adica numarul arcelor care ies din x].
+   Se numeste grad interior al nodului x, numarul arcelor de forma [y,x] [adica numarul arcelor care intra in x].
+
+Def:
+Matrice de adiacenta:
+   Fie G=[V,U] un graf orientat cu n noduri, in care nu exista mai multe arce de la un nod la altul. Matricea de adiacenta a grafului este o matrice cu n linii si n coloane si elemente 0 sau 1, astfel:
+      A[i,j]=1 daca exista arcul [i,j].
+      A[i,j]=0 daca exista nu arcul [i,j].
+Def:
+Graf partial:
+   Fie G=[V, U] un graf orientat. Se numeste graf partial al grafului G, graful orientat G1=[V, U1], unde U1 e submultime al U.
+
+Def:
+Subgraf:
+   Fie G=[V, U] un graf orientat. Se numeste subgraf al grafului G graful orientat G1=[V1,U1] unde V1 e submultime al V iar U1 contine toate arcele din U care au extremitatile in V1.
+
+Def:
+Graf complet:
+   Fie G=[V, U] un graf orientat. Graful G se numeste graf complet daca oricare doua varfuri distincte ale sale sunt adiacente.
+
+Def:
+Lant:
+   Fie G=[V, U] un graf orientat. Se numeste lant, in graful G, o succesiune de noduri, notata L = [x1 , x2 ,..., xp] cu proprietatea ca oricare doua noduri consecutive sunt adiacente.
+
+Def:
+Drum:
+   Fie G=[V, U] un graf orientat. Se numeste drum in graful G o succesiune de noduri, notata D = [x1 , x2 ,..., xk], cu proprietatea ca pentru orice 1<=i<k, [xi,xi+1] este arc in G.
+
+Def:
+Graf tare conex:
+   Graful se numeste tare conex daca intre oricare doua noduri distincte exista cel putin un drum.
+
+[Neorientat]
+Def:
+Graf neorientat:
+Se numeste graf neorientat o pereche ordonata de multimi G=[X,U], unde:
+   X este o multime finita si nevida de elemente numite varfuri sau noduri.
+   U este o multime finita de submultimi cu doua elemente din X, numite muchii.
+
+Def:
+Grad:
+   intr-un graf neorientat se numeste grad al unui varf numarul de varful adiacente cu acesta [sau numarul de muchii incidente cu acesta]. Gradul unui varf x se noteaza d[x].
+
+Def:
+Matrice de adiacenta:
+   Pentru un graf neorientat G=[X,U] cu n varfuri, matricea de adiacenta este o matrice cu n linii si n coloane si 0 sau 1.
+      A[i,j]=1 daca exista muchia [i,j].
+      A[i,j]=0 daca exista nu muchia [i,j].
+
+Def:
+Graf partial:
+   Fie G=[V, U] un graf orientat. Se numeste graf partial al grafului G, graful orientat G1=[V, U1], unde U1 e submultime al U.
+
+Def:
+Subgraf:
+   Fie G=[V, U] un graf orientat. Se numeste subgraf al grafului G graful orientat G1=[V1,U1] unde V1 e submultime al V iar U1 contine toate arcele din U care au extremitatile in V1.
+
+Def:
+Graf nul:
+   Un graf neorientat se numeste graf nul daca multimea muchiilor este vida.
+
+Def:
+Graf complet:
+   Fie G=[X, U] un graf neorientat. Graful G se numeste graf complet daca oricare doua varfuri distincte ale sale sunt adiacente. Un graf complet cu n varfuri se noteaza Kn.
+
+Def:
+Graf regulat:
+   Un graf in care toate nodurile au acelasi grad se numeste graf regulat.
+
+Def:
+Lant:
+   Se numeste lant o succesiune de varfuri L=[x1,x2,...,xk] cu proprietatea ca oricare doua varfuri consecutive sunt adiacente.
+
+Def:
+Ciclu:
+   Se numeste ciclu un lant simplu in care primul varf este identic cu ultimul. Daca toate varfurile sunt distincte, mai putin primul si ultimul, se numeste ciclu elementar.
+
+Def:
+Graf conex:
+   Un graf neorientat se numeste graf conex daca pentru oricare doua varfuri x si y diferite ale sale, exista cel putin un lant care le leaga, adica x este extremitatea initiala si y este extremitatea finala.
+
+Def:
+Componenta conexa:
+   Se numeste componenta conexa a unui graf G=[X,U] un subgraf H=[Y, V], conex, al lui G care are proprietatea ca nu exista nici un lant in G care sa lege un varf din Y cu un varf din X – Y.

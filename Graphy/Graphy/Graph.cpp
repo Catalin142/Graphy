@@ -14,14 +14,11 @@ Graph::Graph(GraphType type) : m_Type(type)
 	m_MatrixPosition.x = 5.0f;
 	m_MatrixPosition.y = m_BufferDim.y - Font::getGlyphHeight() - 3.0f;
 
-	m_ThrashBin = std::make_shared<Texture>("Resources/Editor/RecycleBin.spr"); 
-	m_DeleteSign = std::make_shared<Texture>("Resources/Editor/Delete.spr");
 	m_InputBox = std::make_shared<InputBox>(vec3(0.6f, 0.6f, 0.6f), 18, 7);
 	m_InputBox->setCharacterLimit(3);
 	m_InputBox->setCharacterType(Digit);
 
-	m_ThrashBinSize = { m_ThrashBin->getWidth() * 2.2f, m_ThrashBin->getHeight() * 2.3f };
-	m_ThrashBinPos = { m_BufferDim.x - m_ThrashBinSize.x, m_BufferDim.y - m_LineOffset - m_ThrashBinSize.y };
+	m_DeleteSign = std::make_shared<Texture>("Resources/Editor/Delete.spr");
 
 	m_Links.reserve((40 * (40 - 1)) / 2);
 }
@@ -42,54 +39,11 @@ void Graph::addNode(int x, int y)
 
 void Graph::Update()
 {
-	if (Input::isPressed('W') && m_SelectedNode)
-	{
-		m_SelectedNode->m_HoveredColor = vec3(1.0f, 0.0f, 0.0f);
-		m_Select = true;
-	}
-
-	else if (m_SelectedNode)
-	{
-		if (m_Select)
-			m_SelectedNode->m_isHovered = false;
-
-		m_SelectedNode->m_HoveredColor = m_SelectedNode->m_Color;
-		m_Select = false;
-
-		// Dupa ce selectez un nod sa dau sageata la el si nu misc mouse-ul nu se updateaza nodul selectat asa ca trimit un event sa se updateze
-		auto pt = Input::getMousePosition();
-		MouseMovedEvent ev(pt.x, pt.y);
-		EventDispatcher::Dispatch(ev);
-	}
-
-	if (m_Select)
-	{
-		m_SelectedNode->m_isHovered = true;
-		auto mousePos = Input::WindowToBufferCoordonates(Input::getMousePosition());
-		float rot = std::atan2(mousePos.y - m_SelectedNode->m_Position.y, mousePos.x - m_SelectedNode->m_Position.x);
-		vec2 dir = vec2(cos(rot), sin(rot));
-		vec2 linePosBeg = m_SelectedNode->m_Position + dir * m_SelectedNode->m_Radius;
-		vec2 linePosEnd = mousePos;
-
-		Renderer::drawLine(linePosBeg, linePosEnd, 2.0f, Black);
-
-		if (m_Type == GraphType::Oriented)
-		{
-			rot -= degToRad(30.0f);
-			Renderer::drawLine(linePosEnd, (linePosEnd - vec2(cos(rot), sin(rot)) * 10.0f), 2.0f, Black);
-
-			rot += degToRad(60.0f);
-			Renderer::drawLine(linePosEnd, (linePosEnd - vec2(cos(rot), sin(rot)) * 10.0f), 2.0f, Black);
-		}
-	}
-
-	if (m_SelectedNode)
-		drawNodeProps();
-
 	for (int x = 0; x < m_Nodes.size(); x++)
 	{
 		for (int y = 0; y < m_Nodes.size(); y++)
 		{
+			// Sa deseneze 2 linii doar daca e orientat daca nu doar o linie
 			bool go = true;
 			if (x > y && m_Type == GraphType::Unoriented)
 				go = false;
@@ -104,15 +58,15 @@ void Graph::Update()
 				vec2 linePosBeg = node->m_Position + dir * node->m_Radius;
 				vec2 linePosEnd = snode->m_Position - dir * snode->m_Radius;
 
-				Renderer::drawLine(linePosBeg, linePosEnd, 2.0f, Black);
+				Renderer::drawLine(linePosBeg, linePosEnd, 2.0f, { 0.0f, 0.0f, 0.0f });
 
 				if (m_Type == GraphType::Oriented)
 				{
 					rot -= degToRad(30.0f);
-					Renderer::drawLine(linePosEnd, (linePosEnd - vec2(cos(rot), sin(rot)) * 10.0f), 2.0f, Black);
+					Renderer::drawLine(linePosEnd, (linePosEnd - vec2(cos(rot), sin(rot)) * 10.0f), 2.0f, { 0.0f, 0.0f, 0.0f });
 
 					rot += degToRad(60.0f);
-					Renderer::drawLine(linePosEnd, (linePosEnd - vec2(cos(rot), sin(rot)) * 10.0f), 2.0f, Black);
+					Renderer::drawLine(linePosEnd, (linePosEnd - vec2(cos(rot), sin(rot)) * 10.0f), 2.0f, { 0.0f, 0.0f, 0.0f });
 				}
 			}
 		}
@@ -127,22 +81,12 @@ void Graph::Update()
 	for (const auto& node : m_Nodes)
 		node->Render();
 
-	Renderer::drawLine({ 0.0f, m_BufferDim.y - m_LineOffset },
-		{ (float)m_BufferDim.x, m_BufferDim.y - m_LineOffset }, 0x0000000);
-
-	Renderer::drawLine({ m_MatrixPosition.x + 7 * 7.0f + 2, m_BufferDim.y - m_LineOffset }, { m_MatrixPosition.x + 7 * 7.0f + 2, m_BufferDim.y }, 0x000000);
-	Renderer::drawLine({ m_MatrixPosition.x + 395.0f, m_BufferDim.y - m_LineOffset }, { m_MatrixPosition.x + 395.0f, m_BufferDim.y }, 0x000000);
-
-	Renderer::renderTexture(m_ThrashBin, m_ThrashBinPos, { 2.0f, 2.0f });
-	Renderer::plotQuad(m_ThrashBinPos - vec2(1.0f, 3.0f), m_ThrashBinSize, 0xff00000);
-
 	drawMatrix();
 
 	if (m_SelectedNode)
 		if (Input::isPressed('R') && m_SelectedNode->m_isHovered)
 		{
 			deleteNode();
-			recalculateGrades();
 		}
 }
 
@@ -205,29 +149,6 @@ bool Graph::onEvent(Event& ev)
 		}
 	}
 
-	else if (ev.getType() == EventType::MouseReleased)
-	{
-		auto mp = static_cast<MouseReleasedEvent&>(ev);
-		if (m_SelectedNode)
-		{
-			if (m_SelectedNode->m_isMoved == true)
-			{
-				m_SelectedNode->m_isMoved = false;
-
-				vec2 mousePos = Input::WindowToBufferCoordonates(vec2(mp.getX(), mp.getY()));
-				if (mousePos.x > m_ThrashBinPos.x && mousePos.x < m_ThrashBinPos.x + m_ThrashBinSize.x &&
-					mousePos.y > m_ThrashBinPos.y && mousePos.y < m_ThrashBinPos.y + m_ThrashBinSize.y)
-				{
-					deleteNode();
-					recalculateGrades();
-				}
-
-				return true;
-			}
-
-		}
-	}
-
 	else if (ev.getType() == EventType::MouseMoved)
 	{
 		auto mp = static_cast<MouseMovedEvent&>(ev);
@@ -252,7 +173,7 @@ bool Graph::onEvent(Event& ev)
 
 		for (auto& it = m_Nodes.rbegin(); it != m_Nodes.rend(); it++)
 		{
-			auto node = *it;
+			auto& node = *it;
 			if (!isMoving)
 				if (node->isHovered(pos.x, pos.y) && !m_Select)
 				{
@@ -333,6 +254,7 @@ void Graph::drawNodeProps()
 	m_InputBox->setPosition(pos + vec2(Font::getTextWidth("Nod: ") + 1.0f, 0.0f));
 	m_InputBox->setText(m_SelectedNode->m_Name);
 	m_InputBox->Render();
+
 	Renderer::drawText("Nod: ", pos, 1, {0.0f, 0.0f, 0.0f});
 	pos.y -= Font::getGlyphHeight();
 
@@ -383,6 +305,7 @@ void Graph::deleteNode()
 		node->Refresh();
 
 	recalculateLinks();
+	recalculateGrades();
 	
 	m_SelectedNode = nullptr;
 }

@@ -68,6 +68,14 @@ void Font::Init(const std::string& path, const std::string& numbers, const std::
 	m_GlyphSize[','] = glyphWidth - 4;
 	m_GlyphSize['['] = glyphWidth - 4;
 	m_GlyphSize[']'] = glyphWidth - 4;
+	m_GlyphSize['='] = glyphWidth - 2;
+	m_GlyphSize['*'] = glyphWidth - 5;
+	m_GlyphSize['/'] = glyphWidth - 1;
+	m_GlyphSize['-'] = glyphWidth - 2;
+	m_GlyphSize['+'] = glyphWidth - 1;
+	m_GlyphSize['<'] = glyphWidth - 1;
+	m_GlyphSize['>'] = glyphWidth - 1;
+	m_GlyphSize['\\'] = glyphWidth - 4;
 }
 
 uint Font::getGlyphWidth(char c)
@@ -99,6 +107,14 @@ uint Font::getSymbolOffset(char s)
 	case ',': n = 5; break;
 	case '[': n = 6; break;
 	case ']': n = 7; break;
+	case '=': n = 8; break;
+	case '*': n = 9; break;
+	case '/': n = 10; break;
+	case '-': n = 11; break;
+	case '+': n = 12; break;
+	case '<': n = 13; break;
+	case '>': n = 14; break;
+	case '\\': n = 15; break;
 	}
 
 	return n;

@@ -28,7 +28,7 @@ public:
 	void setSize(int width, int height) { m_Width = width; m_Height = height; Refresh(); }
 	void setTextSize(int x) { m_TextLayout.m_TextSize = x; }
 
-	void setText(const std::string& text, int flags, const vec3& color);
+	void setText(const std::string& text, int flags, const vec3& color, bool clear = true);
 
 	void setOffset(int x, int y) { m_xOffset = x; m_yOffset = y; }
 
