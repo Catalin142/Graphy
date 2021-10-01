@@ -8,7 +8,7 @@
 #include "UI/Button.h"
 #include "UI/TextBox.h"
 
-class Editor : public Layer
+class TreeEditor : public Layer
 {
 public:
 	virtual void onAttach() override;
@@ -34,6 +34,7 @@ private:
 	vec2 m_BufferDim;
 
 	bool m_SpaceState = true;
+	bool m_RState = true;
 
 	std::unordered_map<GraphType, std::vector<std::string>> m_Tips;
 	int m_CurrentTip = 0;

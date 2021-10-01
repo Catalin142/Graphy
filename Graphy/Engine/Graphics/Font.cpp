@@ -99,22 +99,22 @@ uint Font::getSymbolOffset(char s)
 	int n = 0;
 	switch (s)
 	{
-	case '!': n = 0; break;
-	case '?': n = 1; break;
-	case ':': n = 2; break;
-	case ';': n = 3; break;
-	case '.': n = 4; break;
-	case ',': n = 5; break;
-	case '[': n = 6; break;
-	case ']': n = 7; break;
-	case '=': n = 8; break;
-	case '*': n = 9; break;
-	case '/': n = 10; break;
-	case '-': n = 11; break;
-	case '+': n = 12; break;
-	case '<': n = 13; break;
-	case '>': n = 14; break;
-	case '\\': n = 15; break;
+		case '!':  n =  0;  break;
+		case '?':  n =  1;  break;
+		case ':':  n =  2;  break;
+		case ';':  n =  3;  break;
+		case '.':  n =  4;  break;
+		case ',':  n =  5;  break;
+		case '[':  n =  6;  break;
+		case ']':  n =  7;  break;
+		case '=':  n =  8;  break;
+		case '*':  n =  9;  break;
+		case '/':  n = 10;  break;
+		case '-':  n = 11;  break;
+		case '+':  n = 12;  break;
+		case '<':  n = 13;  break;
+		case '>':  n = 14;  break;
+		case '\\': n = 15;  break;
 	}
 
 	return n;

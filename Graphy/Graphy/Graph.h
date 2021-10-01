@@ -17,7 +17,7 @@ enum class GraphType
 
 class Graph
 {
-	friend class Editor;
+	friend class TreeEditor;
 
 public:
 	Graph(GraphType type);

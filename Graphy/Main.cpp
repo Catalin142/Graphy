@@ -1,5 +1,5 @@
 #include "Core/GrPch.h"
-#include "Application/Editor.h"
+#include "Application/TreeEditor.h"
 #include "Application/MainMenu.h"
 
 class Graphy : public Application

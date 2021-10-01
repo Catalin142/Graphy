@@ -82,12 +82,6 @@ void Graph::Update()
 		node->Render();
 
 	drawMatrix();
-
-	if (m_SelectedNode)
-		if (Input::isPressed('R') && m_SelectedNode->m_isHovered)
-		{
-			deleteNode();
-		}
 }
 
 bool Graph::onEvent(Event& ev)

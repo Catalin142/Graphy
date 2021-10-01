@@ -24,6 +24,7 @@ private:
 	std::shared_ptr<Animation> m_Mascota;
 	std::shared_ptr<Texture> m_ButtonFrame;
 
+	std::shared_ptr<Button> m_TreeButton;
 	std::shared_ptr<Button> m_GraphButton;
 	std::shared_ptr<Button> m_TutoialButton;
 

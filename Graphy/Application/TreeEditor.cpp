@@ -1,9 +1,9 @@
 #include "Core/GrPch.h"
-#include "Editor.h"
+#include "TreeEditor.h"
 #include "../Graphy/Node.h"
 #include "MainMenu.h"
 
-void Editor::onAttach()
+void TreeEditor::onAttach()
 {
 	Subscribe<MousePressedEvent>();
 	Subscribe<MouseReleasedEvent>();
@@ -13,8 +13,6 @@ void Editor::onAttach()
 	loadTips("Resources/Editor/Tips.txt");
 
 	m_BufferDim = { (float)Application::Get()->getBuffer()->getWidth(), (float)Application::Get()->getBuffer()->getHeight() };
-
-	Renderer::setClearColor(225.0f / 255.0f, 227.0f / 255.0f, 221.0f / 255.0f);
 
 	std::shared_ptr<Texture> m_ButtonFrame = std::make_shared<Texture>("Resources/Menu/ButtonFrame.spr");
 
@@ -54,7 +52,7 @@ void Editor::onAttach()
 	m_ThrashBinPos = { m_BufferDim.x - m_ThrashBinSize.x, m_BufferDim.y - m_LineOffset - m_ThrashBinSize.y };
 }
 
-void Editor::onUpdate(float deltaTime)
+void TreeEditor::onUpdate(float deltaTime)
 {
 	Renderer::Clear();
 
@@ -164,12 +162,21 @@ void Editor::onUpdate(float deltaTime)
 
 		m_BackButton->Render();
 
+		bool rtate = Input::isPressed('R');
+
+		if (rtate != m_RState && rtate == true)
+		{
+			if (m_Graph->m_SelectedNode)
+				m_Graph->deleteNode();
+			m_RState = true;
+		}
+		else if (rtate == false) m_RState = false;
+
 		m_Graph->Update();
 	}
-
 }
 
-bool Editor::onEvent(Event& ev)
+bool TreeEditor::onEvent(Event& ev)
 {
 
 	if (m_GraphType == GraphType::None)
@@ -248,7 +255,7 @@ bool Editor::onEvent(Event& ev)
 	return false;
 }
 
-void Editor::createTextBox()
+void TreeEditor::createTextBox()
 {
 	m_TipsBox = std::make_shared<TextBox>(vec3(225.0f / 255.0f, 227.0f / 255.0f, 221.0f / 255.0f),
 		(m_Graph->m_MatrixPosition.x + 395.0f) - (m_Graph->m_MatrixPosition.x + 7 * 7.0f + 2) - 2,
@@ -258,13 +265,13 @@ void Editor::createTextBox()
 	setTip();
 }
 
-void Editor::setTip()
+void TreeEditor::setTip()
 {
 	m_TipsBox->setText(m_Tips[m_GraphType][m_CurrentTip], Top | Left, { 0.0f, 0.0f, 0.0f });
 	m_TipsBox->setText(std::to_string(m_CurrentTip + 1) + "\\" + std::to_string(m_Tips[m_GraphType].size()), Bottom | Right, {0.0f, 0.0f, 0.0f}, false);
 }
 
-void Editor::loadTips(const std::string& filepath)
+void TreeEditor::loadTips(const std::string& filepath)
 {
 	std::fstream doc(filepath);
 	if (!doc.good())
