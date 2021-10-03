@@ -16,6 +16,11 @@ bool InputBox::onMousePressed(const vec2& pos)
 	return pressed;
 }
 
+void InputBox::Activate()
+{
+	m_WaitForInput = true;
+}
+
 bool InputBox::onKeyDown(int code)
 {
 	if (m_WaitForInput == true)

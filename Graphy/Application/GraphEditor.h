@@ -3,6 +3,7 @@
 #include "../Graphy/Node.h"
 #include "Maths/Maths.h"
 #include "Core/Layer.h"
+#include "UI/Button.h"
 
 class GraphEditor : public Layer
 {
@@ -12,16 +13,17 @@ public:
 	virtual bool onEvent(Event& ev) override;
 
 private:
-	struct Point
-	{
-		std::shared_ptr<Node> Node;
-		vec2 m_CartezianCoord;
-	};
-
-	std::vector<Point> m_Points;
+	std::vector<std::shared_ptr<Node>> m_Points;
 	vec2 m_BufferDim;
 
-	int m_LineOffset = 55.0f;
+	int m_LineOffset = 55.0f - 38.0f;
 	float m_LineDistance = 19.0f;
 	float m_Margin = 12.0f;
+
+	std::shared_ptr<Button> m_BackButton;
+
+	std::shared_ptr<Node> m_CurrentPoint;
+	std::string m_Letter = "a";
+
+	bool m_SpaceState = true;
 };

@@ -9,8 +9,8 @@ void MainMenu::onAttach()
     Subscribe<MouseMovedEvent>();
     Subscribe<KeyPressedEvent>();
 
-    m_Logo = std::make_shared<Texture>("Resources/Menu/Logo.spr");
-    m_ButtonFrame = std::make_shared<Texture>("Resources/Menu/ButtonFrame.spr");
+    m_Logo = TextureManager::loadTexture("Resources/Menu/Logo.spr");
+    m_ButtonFrame = TextureManager::loadTexture("Resources/Menu/ButtonFrame.spr");
 
     m_Mascota = std::make_shared<Animation>(0.4f); 
     m_Mascota->addFrame("Resources/Menu/Mascota.spr");

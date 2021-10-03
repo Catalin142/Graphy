@@ -5,10 +5,10 @@
 
 Texture::Texture(const std::string& filepath) : m_Filepath(filepath)
 {
-	assert(loadSprite(filepath));
+	loadTexture(filepath);
 }
 
-bool Texture::loadSprite(const std::string& filepath)
+bool Texture::loadTexture(const std::string& filepath)
 {
 	std::ifstream readFile(m_Filepath.c_str(), std::ios::in | std::ios::binary);
 	std::string extension = std::string(m_Filepath.begin() + m_Filepath.find_last_of(".") + 1, m_Filepath.end());
@@ -45,4 +45,16 @@ const unsigned long& Texture::getPixelColor(float x, float y) const
 	float yCoord = y * m_Height;
 
 	return *(m_Buffer + (int)yCoord * m_Width + (int)xCoord);
+}
+
+std::unordered_map<std::string, std::shared_ptr<Texture>> TextureManager::m_TextureCache;
+
+std::shared_ptr<Texture> TextureManager::loadTexture(const std::string& filepath)
+{
+	if (m_TextureCache.find(filepath) != m_TextureCache.end())
+		return m_TextureCache[filepath];
+
+	std::shared_ptr<Texture> tex = std::make_shared<Texture>(filepath);
+	m_TextureCache[filepath] = tex;
+	return tex;
 }

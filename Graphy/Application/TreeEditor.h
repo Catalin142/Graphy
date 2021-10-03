@@ -3,7 +3,7 @@
 #include "Core/Layer.h"
 #include "Core/Application.h"
 #include "Renderer/Renderer.h"
-#include "../Graphy/Graph.h"
+#include "../Graphy/Tree.h"
 #include "System/Input.h"
 #include "UI/Button.h"
 #include "UI/TextBox.h"
@@ -16,8 +16,8 @@ public:
 	virtual bool onEvent(Event& ev) override;
 
 private:
-	std::shared_ptr<Graph> m_Graph;
-	GraphType m_GraphType = GraphType::None;
+	std::shared_ptr<Tree> m_Graph;
+	TreeType m_GraphType = TreeType::None;
 
 	int m_LineOffset = 55.0f;
 
@@ -27,16 +27,11 @@ private:
 	std::shared_ptr<Button> m_NeoButton;
 	std::shared_ptr<Button> m_BackButton;
 
-	std::shared_ptr<Texture> m_ThrashBin;
-	vec2 m_ThrashBinSize;
-	vec2 m_ThrashBinPos;
-
 	vec2 m_BufferDim;
 
 	bool m_SpaceState = true;
-	bool m_RState = true;
 
-	std::unordered_map<GraphType, std::vector<std::string>> m_Tips;
+	std::unordered_map<TreeType, std::vector<std::string>> m_Tips;
 	int m_CurrentTip = 0;
 	float m_ChangeInterval = 7.0f;
 	float m_LastChange = 0.0f;
@@ -45,4 +40,7 @@ private:
 	void createTextBox();
 	void setTip();
 	void loadTips(const std::string& filepath);
+
+	void drawNodeProps();
+	void drawMatrix();
 };

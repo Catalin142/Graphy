@@ -8,23 +8,23 @@
 
 class Node;
 
-enum class GraphType
+enum class TreeType
 {
 	None,
 	Oriented,
 	Unoriented
 };
 
-class Graph
+class Tree
 {
 	friend class TreeEditor;
 
 public:
-	Graph(GraphType type);
-	~Graph() = default;
+	Tree(TreeType type);
+	~Tree() = default;
 
 	void addNode(int x, int y);
-	void Update();
+	void Render();
 
 	bool onEvent(Event& ev);
 
@@ -40,7 +40,7 @@ private:
 
 	bool m_Select = false;
 
-	GraphType m_Type;
+	TreeType m_Type;
 	vec2 m_BufferDim;
 
 	std::shared_ptr<Texture> m_DeleteSign;
@@ -50,9 +50,6 @@ private:
 
 private:
 	std::shared_ptr<Node>& getNode(int id);
-
-	void drawMatrix();
-	void drawNodeProps();
 
 	void recalculateGrades();
 	void recalculateLinks();

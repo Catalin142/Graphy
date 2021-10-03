@@ -1,13 +1,13 @@
 #include "Core/GrPch.h"
 #include "Node.h"
-#include "Graph.h"
+#include "Tree.h"
 
 #include "System/Input.h"
 #include "Core/Application.h"
 #include "Graphics/Font.h"
 #include "Renderer/Renderer.h"
 
-Graph::Graph(GraphType type) : m_Type(type)
+Tree::Tree(TreeType type) : m_Type(type)
 {
 	m_BufferDim.x = Application::Get()->getBuffer()->getWidth();
 	m_BufferDim.y = Application::Get()->getBuffer()->getHeight();
@@ -18,12 +18,12 @@ Graph::Graph(GraphType type) : m_Type(type)
 	m_InputBox->setCharacterLimit(3);
 	m_InputBox->setCharacterType(Digit);
 
-	m_DeleteSign = std::make_shared<Texture>("Resources/Editor/Delete.spr");
+	m_DeleteSign = TextureManager::loadTexture("Resources/Editor/Delete.spr");
 
 	m_Links.reserve((40 * (40 - 1)) / 2);
 }
 
-void Graph::addNode(int x, int y)
+void Tree::addNode(int x, int y)
 {
 	if (m_Nodes.empty())
 		m_LastNumber = 0;
@@ -37,7 +37,7 @@ void Graph::addNode(int x, int y)
 	}
 }
 
-void Graph::Update()
+void Tree::Render()
 {
 	for (int x = 0; x < m_Nodes.size(); x++)
 	{
@@ -45,7 +45,7 @@ void Graph::Update()
 		{
 			// Sa deseneze 2 linii doar daca e orientat daca nu doar o linie
 			bool go = true;
-			if (x > y && m_Type == GraphType::Unoriented)
+			if (x > y && m_Type == TreeType::Unoriented)
 				go = false;
 
 			if (m_Matrix[x][y] == 1 && go)
@@ -60,7 +60,7 @@ void Graph::Update()
 
 				Renderer::drawLine(linePosBeg, linePosEnd, 2.0f, { 0.0f, 0.0f, 0.0f });
 
-				if (m_Type == GraphType::Oriented)
+				if (m_Type == TreeType::Oriented)
 				{
 					rot -= degToRad(30.0f);
 					Renderer::drawLine(linePosEnd, (linePosEnd - vec2(cos(rot), sin(rot)) * 10.0f), 2.0f, { 0.0f, 0.0f, 0.0f });
@@ -80,65 +80,78 @@ void Graph::Update()
 
 	for (const auto& node : m_Nodes)
 		node->Render();
-
-	drawMatrix();
 }
 
-bool Graph::onEvent(Event& ev)
+bool Tree::onEvent(Event& ev)
 {
 	if (ev.getType() == EventType::MousePressed)
 	{
 		auto mp = static_cast<MousePressedEvent&>(ev);
 		vec2 mousePos = Input::WindowToBufferCoordonates(vec2(mp.getX(), mp.getY()));
 
-		if (m_InputBox->onMousePressed(mousePos))
-			return true;
-
-		for (auto& it = m_Nodes.rbegin(); it != m_Nodes.rend(); it++)
+		if (mp.getMouseCode() == VK_MOUSE_LEFT)
 		{
-			auto node = *it;
-			if (node->isPressed(mousePos.x, mousePos.y))
+			if (m_InputBox->onMousePressed(mousePos))
 			{
-				if (!m_Select)
-				{
-					node->m_isMoved = true;
-				}
-				else
-				{
-					if (m_SelectedNode->m_ID != node->m_ID)
-					{
-						m_Matrix[m_SelectedNode->m_ID][node->m_ID] = 1;
-
-						if (m_Type == GraphType::Unoriented)
-							m_Matrix[node->m_ID][m_SelectedNode->m_ID] = 1;
-
-						recalculateGrades();
-						recalculateLinks();
-					}
-				}
+				m_SelectedNode->m_Name = "";
 				return true;
+			}
+
+			for (auto& it = m_Nodes.rbegin(); it != m_Nodes.rend(); it++)
+			{
+				auto node = *it;
+				if (node->isPressed(mousePos.x, mousePos.y))
+				{
+					if (!m_Select)
+					{
+						node->m_isMoved = true;
+					}
+					else
+					{
+						if (m_SelectedNode->m_ID != node->m_ID)
+						{
+							m_Matrix[m_SelectedNode->m_ID][node->m_ID] = 1;
+
+							if (m_Type == TreeType::Unoriented)
+								m_Matrix[node->m_ID][m_SelectedNode->m_ID] = 1;
+
+							recalculateGrades();
+							recalculateLinks();
+						}
+					}
+					return true;
+				}
 			}
 		}
 
-		if (m_DrawLink != -1)
+		else if (mp.getMouseCode() == VK_MOUSE_RIGHT)
 		{
-			float size = m_Links[m_DrawLink].m_BoxSize + 7.0f;
-			vec2 boxPos = m_Links[m_DrawLink].m_Middle - vec2(3.5f, 3.5f);
-
-			if (mousePos.x > boxPos.x && mousePos.x < boxPos.x + size &&
-				mousePos.y > boxPos.y && mousePos.y < boxPos.y + size)
+			if (m_SelectedNode && m_SelectedNode->isHovered(mousePos.x, mousePos.y))
 			{
-				m_Matrix[m_Links[m_DrawLink].m_IDLeft][m_Links[m_DrawLink].m_IDRight] = 0;
-				if (m_Type == GraphType::Unoriented)
-				{
-					m_Matrix[m_Links[m_DrawLink].m_IDRight][m_Links[m_DrawLink].m_IDLeft] = 0;
-				}
-
-				m_DrawLink = -1;
-				recalculateLinks();
-				recalculateGrades();
-
+				deleteNode();
 				return true;
+			}
+
+			if (m_DrawLink != -1)
+			{
+				float size = m_Links[m_DrawLink].m_BoxSize + 7.0f;
+				vec2 boxPos = m_Links[m_DrawLink].m_Middle - vec2(3.5f, 3.5f);
+
+				if (mousePos.x > boxPos.x && mousePos.x < boxPos.x + size &&
+					mousePos.y > boxPos.y && mousePos.y < boxPos.y + size)
+				{
+					m_Matrix[m_Links[m_DrawLink].m_IDLeft][m_Links[m_DrawLink].m_IDRight] = 0;
+					if (m_Type == TreeType::Unoriented)
+					{
+						m_Matrix[m_Links[m_DrawLink].m_IDRight][m_Links[m_DrawLink].m_IDLeft] = 0;
+					}
+
+					m_DrawLink = -1;
+					recalculateLinks();
+					recalculateGrades();
+
+					return true;
+				}
 			}
 		}
 	}
@@ -165,14 +178,19 @@ bool Graph::onEvent(Event& ev)
 			}
 		}
 
+		bool found = false;
 		for (auto& it = m_Nodes.rbegin(); it != m_Nodes.rend(); it++)
 		{
 			auto& node = *it;
 			if (!isMoving)
-				if (node->isHovered(pos.x, pos.y) && !m_Select)
+				if (node->isHovered(pos.x, pos.y))
 				{
-					m_SelectedNode = node;
-					break;
+					if (found == false)
+						found = true;
+					else node->m_isHovered = false;
+
+					if (!m_Select)
+						m_SelectedNode = node;
 				}
 		}
 
@@ -209,60 +227,14 @@ bool Graph::onEvent(Event& ev)
 	return false;
 }
 
-std::shared_ptr<Node>& Graph::getNode(int id)
+std::shared_ptr<Node>& Tree::getNode(int id)
 {
 	auto it = std::find_if(m_Nodes.begin(), m_Nodes.end(), [&](const auto& node) -> bool {
 		return node->m_ID == id; });
 	return *it;
 }
 
-void Graph::drawMatrix()
-{
-	int Limit;
-	if (Input::isPressed(VK_TAB))
-	{
-		Limit = m_Nodes.size();
-		Renderer::drawQuad({ m_MatrixPosition.x - 1.0f, m_MatrixPosition.y - (Limit - 1) * 7.0f }, { Limit * 7.0f, Limit * 7.0f }, { 1.0f, 1.0f, 1.0f });
-	}
-
-	else Limit = Clamp(m_Nodes.size(), 0, 7);
-
-	auto pos = m_MatrixPosition;
-	for (int x = 0; x < Limit; x++)
-	{
-		pos.x = m_MatrixPosition.x;
-		for (int y = 0; y < Limit; y++)
-		{
-			Renderer::drawNumber((char)m_Matrix[x][y] + '0', pos, 1, 0x000000);
-			pos.x += 7.0f;
-		}
-		pos.y -= Font::getGlyphHeight();
-	}
-}
-
-void Graph::drawNodeProps()
-{
-	auto pos = m_MatrixPosition;
-	pos.x += 400.0f;
-
-	m_InputBox->setPosition(pos + vec2(Font::getTextWidth("Nod: ") + 1.0f, 0.0f));
-	m_InputBox->setText(m_SelectedNode->m_Name);
-	m_InputBox->Render();
-
-	Renderer::drawText("Nod: ", pos, 1, {0.0f, 0.0f, 0.0f});
-	pos.y -= Font::getGlyphHeight();
-
-	Renderer::drawText("ID [in matrice]: " + std::to_string(m_SelectedNode->m_ID), pos, 1, {0.0f, 0.0f, 0.0f});
-	pos.y -= Font::getGlyphHeight();
-
-	Renderer::drawText("Grad interior: " + std::to_string(m_SelectedNode->m_InternalDegree), pos, 1, { 0.0f, 0.0f, 0.0f });
-	pos.y -= Font::getGlyphHeight();
-
-	Renderer::drawText("Grad exterior: " + std::to_string(m_SelectedNode->m_ExternalDegree), pos, 1, { 0.0f, 0.0f, 0.0f });
-	pos.y -= Font::getGlyphHeight();
-}
-
-void Graph::deleteNode()
+void Tree::deleteNode()
 {
 	int ID = m_SelectedNode->m_ID;
 	int size = m_Nodes.size();
@@ -304,7 +276,7 @@ void Graph::deleteNode()
 	m_SelectedNode = nullptr;
 }
 
-void Graph::recalculateGrades()
+void Tree::recalculateGrades()
 {
 	if (m_Nodes.size() > 0)
 	{
@@ -327,7 +299,7 @@ void Graph::recalculateGrades()
 	}
 }
 
-void Graph::recalculateLinks()
+void Tree::recalculateLinks()
 {
 	m_Links.clear();
 	for(int x = 0; x < m_Nodes.size(); x++)

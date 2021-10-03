@@ -17,9 +17,9 @@ Numarul reprezinta cat de lat e fiecare caracter ca toate sa stea la distanta eg
 
 void Font::Init(const std::string& path, const std::string& numbers, const std::string& symbols, int glyphWidth, int glyphHeight)
 {
-	m_FontSheet = std::make_shared<Texture>(path);
-	m_NumbersSheet = std::make_shared<Texture>(numbers);
-	m_SymbolsSheet = std::make_shared<Texture>(symbols);
+	m_FontSheet = TextureManager::loadTexture(path);
+	m_NumbersSheet =  TextureManager::loadTexture(numbers);
+	m_SymbolsSheet =  TextureManager::loadTexture(symbols);
 
 	m_GlyphWidth = glyphWidth;
 	m_GlyphHeight = glyphHeight;

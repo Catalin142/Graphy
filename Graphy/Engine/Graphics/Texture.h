@@ -14,13 +14,14 @@ class Texture
 	friend class Renderer;
 	friend class TextBox;
 	friend class InteractableUI;
+	friend class TextureManager;
 
 public:
 	Texture() = default;
 	Texture(const std::string& filepath);
+
 	~Texture() = default;
 
-	bool loadSprite(const std::string& filepath);
 	const unsigned long& getPixelColor(float x, float y) const;
 
 	float getAspectRatio() { return (float)m_Width / (float)m_Height; }
@@ -34,4 +35,17 @@ private:
 	int m_Height;
 
 	std::string m_Filepath;
+
+private:
+
+	bool loadTexture(const std::string& filepath);
+};
+
+class TextureManager
+{
+public:
+	static std::shared_ptr<Texture> loadTexture(const std::string& filepath);
+
+private:
+	static std::unordered_map<std::string, std::shared_ptr<Texture>> m_TextureCache;
 };

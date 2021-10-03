@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Maths/Maths.h"
-#include "Graph.h"
+#include "Tree.h"
 
 class Node
 {
-	friend class Graph;
+	friend class Tree;
 	friend class TreeEditor;
 	friend class GraphEditor;
 

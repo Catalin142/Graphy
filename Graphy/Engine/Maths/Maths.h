@@ -82,3 +82,8 @@ static vec3 createRGB(unsigned long hex)
 {
 	return vec3(float((hex >> 16) & 0xff), float((hex >> 8) & 0xff), float((hex) & 0xff)) / 255.0f;
 }
+
+static float distance(const vec2& left, const vec2& right)
+{
+	return sqrt((left.x - right.x) * (left.x - right.x) + (left.y - right.y) * (left.y - right.y));
+}

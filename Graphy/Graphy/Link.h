@@ -3,7 +3,7 @@
 #include "Maths/Maths.h"
 class Link
 {
-	friend class Graph;
+	friend class Tree;
 
 public:
 	Link(const vec2& head1, const vec2& head2, int id1, int id2);

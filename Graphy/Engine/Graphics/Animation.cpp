@@ -12,7 +12,7 @@ void Animation::addFrame(const std::shared_ptr<Texture>& fr)
 
 void Animation::addFrame(const std::string& fp)
 {
-	m_Frames.push_back(std::make_shared<Texture>(fp));
+	m_Frames.push_back(TextureManager::loadTexture(fp));
 }
 
 void Animation::Play(float deltaTime)

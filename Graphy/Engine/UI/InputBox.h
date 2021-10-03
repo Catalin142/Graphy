@@ -16,6 +16,7 @@ public:
 	InputBox(const vec3& color, float width, float height);
 
 	bool onMousePressed(const vec2& pos);
+	void Activate();
 	bool onKeyDown(int code);
 
 	void Render();
