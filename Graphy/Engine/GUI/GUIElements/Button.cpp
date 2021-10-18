@@ -14,10 +14,10 @@ void Button::Render()
 	Renderer::drawText(m_Text, m_TextPosition, m_TextSize, TextColor);
 }
 
-bool Button::onMousePressed(const vec2& position)
+bool Button::onMousePressed(int x, int y)
 {
-	if (position.x > m_NormalPosition.x && position.x < m_NormalPosition.x + m_Size.x &&
-		position.y > m_NormalPosition.y && position.y < m_NormalPosition.y + m_Size.y)
+	if (x > m_NormalPosition.x && x < m_NormalPosition.x + m_Size.x &&
+		y > m_NormalPosition.y && y < m_NormalPosition.y + m_Size.y)
 	{
 		m_Callback();
 		return true;
@@ -25,10 +25,10 @@ bool Button::onMousePressed(const vec2& position)
 	return false;
 }
 
-bool Button::onMouseMoved(const vec2& position)
+bool Button::onMouseMoved(int x, int y)
 {
-	if (position.x > m_NormalPosition.x && position.x < m_NormalPosition.x + m_Size.x &&
-		position.y > m_NormalPosition.y && position.y < m_NormalPosition.y + m_Size.y)
+	if (x > m_NormalPosition.x && x < m_NormalPosition.x + m_Size.x &&
+		y > m_NormalPosition.y && y < m_NormalPosition.y + m_Size.y)
 	{
 		m_Position = m_HoverPosition;
 		setText(m_Text, (TextAnchorFlags)m_Flags);

@@ -2,6 +2,7 @@
 #include "MainMenu.h"
 #include "TreeEditor.h"
 #include "GraphEditor.h"
+#include "TheoryTab.h"
 
 void MainMenu::onAttach()
 {
@@ -27,26 +28,23 @@ void MainMenu::onAttach()
     m_NumeleMeuPos.y = 0;
     m_NumeleMeuPos.x -= Font::getTextWidth("Popa Catalin", 2) + 10.0f;
 
-    m_TreeButton = std::make_shared<Button>(m_ButtonFrame, vec2(85.0f, 140.0f), vec2(200.0f, 30.0f));
-    m_TreeButton->setText("Creeaza graf", Center);
-    m_TreeButton->TextColor = vec3(0.0f, 0.0f, 0.0f);
-    m_TreeButton->setCallback([]() -> void {
+    GUIManager.Add("Graf", new Button(m_ButtonFrame, vec2(85.0f, 140.0f), vec2(200.0f, 30.0f)));
+    GUIManager.Get<Button>("Graf")->setText("Creeaza graf", Center);
+    GUIManager.Get<Button>("Graf")->setCallback([]() -> void {
         Application::Get()->setLayer(new TreeEditor);
         });
 
-   m_GraphButton = std::make_shared<Button>(m_ButtonFrame, vec2(85.0f, 100.0f), vec2(200.0f, 30.0f));
-   m_GraphButton->setText("Creeaza grafic", Center);
-   m_GraphButton->TextColor = vec3(0.0f, 0.0f, 0.0f);
-   m_GraphButton->setCallback([]() -> void {
+    GUIManager.Add("Grafic", new Button(m_ButtonFrame, vec2(85.0f, 100.0f), vec2(200.0f, 30.0f)));
+    GUIManager.Get<Button>("Grafic")->setText("Creeaza grafic", Center);
+    GUIManager.Get<Button>("Grafic")->setCallback([]() -> void {
         Application::Get()->setLayer(new GraphEditor);
         });
 
 
-    m_TutoialButton = std::make_shared<Button>(m_ButtonFrame, vec2(85.0f, 60.0f), vec2(200.0f, 30.0f));
-    m_TutoialButton->setText("Teorie", Center);
-    m_TutoialButton->TextColor = vec3(0.0f, 0.0f, 0.0f);
-    m_TutoialButton->setCallback([]() -> void {
-        std::cout << "A" << std::endl;
+    GUIManager.Add("Teorie", new Button(m_ButtonFrame, vec2(85.0f, 60.0f), vec2(200.0f, 30.0f)));
+    GUIManager.Get<Button>("Teorie")->setText("Teorie", Center);
+    GUIManager.Get<Button>("Teorie")->setCallback([]() -> void {
+        Application::Get()->setLayer(new TheoryTab);
         });
 }
 
@@ -62,44 +60,11 @@ void MainMenu::onUpdate(float deltaTime)
     Renderer::drawText("Popa Catalin", m_NumeleMeuPos, 2.0f, vec3(0.0f, 0.0f, 0.0f));
     Renderer::drawText("V 1.0", { 3.0f, 0.0f }, 2.0f, vec3(0.0f, 0.0f, 0.0f));
 
-    m_TreeButton->Render();
-    m_GraphButton->Render();
-    m_TutoialButton->Render();
+    GUIManager.Render();
 }
 
 bool MainMenu::onEvent(Event& ev)
 {
-    if (ev.getType() == EventType::MousePressed)
-    {
-        auto mp = static_cast<MousePressedEvent&>(ev);
-        vec2 mousePos = Input::WindowToBufferCoordonates(vec2(mp.getX(), mp.getY()));
-
-        if (m_TreeButton->onMousePressed(mousePos))
-            return true;
-
-        else if (m_GraphButton->onMousePressed(mousePos))
-            return true;
-
-        else if (m_TutoialButton->onMousePressed(mousePos))
-            return true;
-
-        return false;
-    }
-
-    else if (ev.getType() == EventType::MouseMoved)
-    {
-        auto mp = static_cast<MouseMovedEvent&>(ev);
-        vec2 mousePos = Input::WindowToBufferCoordonates(vec2(mp.getX(), mp.getY()));
-
-        if (m_TreeButton->onMouseMoved(mousePos))
-            return true;
-
-        else if (m_GraphButton->onMouseMoved(mousePos))
-            return true;
-
-        else  if (m_TutoialButton->onMouseMoved(mousePos))
-            return true;
-
-        return false;
-    }
+    if (GUIManager.onEvent(ev))
+        return true;
 }

@@ -10,18 +10,15 @@ void GraphEditor::onAttach()
 	Subscribe<MousePressedEvent>();
 	Subscribe<MouseMovedEvent>();
 
-	m_BufferDim = { (float)Application::Get()->getBuffer()->getWidth(), (float)Application::Get()->getBuffer()->getHeight() };
-
 	auto& bf = TextureManager::loadTexture("Resources/Menu/ButtonFrame.spr");
 
-	m_BackButton = std::make_shared<Button>(bf,
+	GUIManager.Add("Return", new Button(bf,
 		vec2(5.0f, m_BufferDim.y - m_LineOffset + 4),
-		vec2(bf->getWidth(), bf->getHeight()));
-	m_BackButton->setTextSize(1);
-	m_BackButton->setHoverAnimationDist(2.5f);
-	m_BackButton->setText("Inapoi", Center);
-	m_BackButton->TextColor = vec3(0.0f, 0.0f, 0.0f);
-	m_BackButton->setCallback([&]() -> void {
+		vec2(bf->getWidth(), bf->getHeight())));
+	GUIManager.Get<Button>("Return")->setTextSize(1);
+	GUIManager.Get<Button>("Return")->setHoverAnimationDist(2.5f);
+	GUIManager.Get<Button>("Return")->setText("Inapoi", Center);
+	GUIManager.Get<Button>("Return")->setCallback([&]() -> void {
 		Application::Get()->setLayer(new MainMenu);
 		});
 }
@@ -29,6 +26,8 @@ void GraphEditor::onAttach()
 void GraphEditor::onUpdate(float deltaTime)
 {
 	Renderer::Clear();
+
+	GUIManager.Render();
 
 	float beg = m_LineOffset + m_Margin;
 	for (int i = 1; i < m_BufferDim.x / m_LineDistance; i++)
@@ -72,8 +71,6 @@ void GraphEditor::onUpdate(float deltaTime)
 		node->Refresh();
 		m_Points.push_back(node);
 
-		std::sort(m_Points.begin(), m_Points.end(), [](const auto& left, const auto& right) -> bool {return left->m_Name[0] < right->m_Name[0]; });
-
 		m_Letter[0] += 1;
 		if (m_Letter[0] > 'z')
 			m_Letter[0] = 'a';
@@ -116,35 +113,26 @@ void GraphEditor::onUpdate(float deltaTime)
 			{ (float)m_BufferDim.x - m_Margin, (float)posY }, 1, { 0.0f, 0.0f, 0.0f });
 	}
 
-	m_BackButton->Render();
-
 	for (auto& point : m_Points)
 		point->Render();
 }
 
 bool GraphEditor::onEvent(Event& ev)
 {
-	if(ev.getType() == EventType::MousePressed)
+	if (GUIManager.onEvent(ev))
+		return true;
+
+	else if(ev.getType() == EventType::MousePressed)
 	{
 		auto mp = static_cast<MousePressedEvent&>(ev);
 		vec2 mousePos = Input::WindowToBufferCoordonates(vec2(mp.getX(), mp.getY()));
 		
-		if (mp.getMouseCode() == VK_MOUSE_LEFT)
-		{
-
-			if (m_BackButton->onMousePressed(mousePos))
-				return true;
-		}
-
-		else if (mp.getMouseCode() == VK_MOUSE_RIGHT)
+		if (mp.getMouseCode() == VK_MOUSE_RIGHT)
 		{
 			if (m_CurrentPoint && m_CurrentPoint->isHovered(mousePos.x, mousePos.y))
 			{
 				m_Points.erase(std::find(m_Points.begin(), m_Points.end(), m_CurrentPoint));
 				m_CurrentPoint = nullptr;
-
-				if (m_Points.size() == 0)
-					m_Letter[0] = 'a';
 			}
 		}
 	}
@@ -153,18 +141,17 @@ bool GraphEditor::onEvent(Event& ev)
 	{
 		auto mp = static_cast<MouseMovedEvent&>(ev);
 		vec2 mousePos = Input::WindowToBufferCoordonates(vec2(mp.getX(), mp.getY()));
-		if (m_BackButton->onMouseMoved(mousePos))
-			return true;
 
 		bool found = false;
 		for (auto& point = m_Points.rbegin(); point != m_Points.rend(); point++)
 			if ((*point)->isHovered(mousePos.x, mousePos.y))
 			{
 				if (found == false)
+					m_CurrentPoint = *point;
+
+				if (found == false)
 					found = true;
 				else (*point)->m_isHovered = false;
-
-				m_CurrentPoint = *point;
 			}
 	}
 

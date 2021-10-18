@@ -7,16 +7,16 @@
 #include "Graphics/Font.h"
 #include "Renderer/Renderer.h"
 
-Tree::Tree(TreeType type) : m_Type(type)
+Tree::Tree(GraphType type) : m_Type(type)
 {
 	m_BufferDim.x = Application::Get()->getBuffer()->getWidth();
 	m_BufferDim.y = Application::Get()->getBuffer()->getHeight();
 	m_MatrixPosition.x = 5.0f;
 	m_MatrixPosition.y = m_BufferDim.y - Font::getGlyphHeight() - 3.0f;
 
-	m_InputBox = std::make_shared<InputBox>(vec3(0.6f, 0.6f, 0.6f), 18, 7);
-	m_InputBox->setCharacterLimit(3);
-	m_InputBox->setCharacterType(Digit);
+	//m_InputBox = std::make_shared<InputBox>(vec3(0.6f, 0.6f, 0.6f), 18, 7);
+	//m_InputBox->setCharacterLimit(3);
+	//m_InputBox->setCharacterType(Digit);
 
 	m_DeleteSign = TextureManager::loadTexture("Resources/Editor/Delete.spr");
 
@@ -45,7 +45,7 @@ void Tree::Render()
 		{
 			// Sa deseneze 2 linii doar daca e orientat daca nu doar o linie
 			bool go = true;
-			if (x > y && m_Type == TreeType::Unoriented)
+			if (x > y && m_Type == GraphType::Unoriented)
 				go = false;
 
 			if (m_Matrix[x][y] == 1 && go)
@@ -60,7 +60,7 @@ void Tree::Render()
 
 				Renderer::drawLine(linePosBeg, linePosEnd, 2.0f, { 0.0f, 0.0f, 0.0f });
 
-				if (m_Type == TreeType::Oriented)
+				if (m_Type == GraphType::Oriented)
 				{
 					rot -= degToRad(30.0f);
 					Renderer::drawLine(linePosEnd, (linePosEnd - vec2(cos(rot), sin(rot)) * 10.0f), 2.0f, { 0.0f, 0.0f, 0.0f });
@@ -82,7 +82,7 @@ void Tree::Render()
 		node->Render();
 }
 
-bool Tree::onEvent(Event& ev)
+NodeEvent Tree::onEvent(Event& ev)
 {
 	if (ev.getType() == EventType::MousePressed)
 	{
@@ -91,12 +91,6 @@ bool Tree::onEvent(Event& ev)
 
 		if (mp.getMouseCode() == VK_MOUSE_LEFT)
 		{
-			if (m_InputBox->onMousePressed(mousePos))
-			{
-				m_SelectedNode->m_Name = "";
-				return true;
-			}
-
 			for (auto& it = m_Nodes.rbegin(); it != m_Nodes.rend(); it++)
 			{
 				auto node = *it;
@@ -105,6 +99,7 @@ bool Tree::onEvent(Event& ev)
 					if (!m_Select)
 					{
 						node->m_isMoved = true;
+						return NodeEvent::Moved;
 					}
 					else
 					{
@@ -112,14 +107,14 @@ bool Tree::onEvent(Event& ev)
 						{
 							m_Matrix[m_SelectedNode->m_ID][node->m_ID] = 1;
 
-							if (m_Type == TreeType::Unoriented)
+							if (m_Type == GraphType::Unoriented)
 								m_Matrix[node->m_ID][m_SelectedNode->m_ID] = 1;
 
 							recalculateGrades();
 							recalculateLinks();
+							return NodeEvent::Link;
 						}
 					}
-					return true;
 				}
 			}
 		}
@@ -129,7 +124,7 @@ bool Tree::onEvent(Event& ev)
 			if (m_SelectedNode && m_SelectedNode->isHovered(mousePos.x, mousePos.y))
 			{
 				deleteNode();
-				return true;
+				return NodeEvent::Delete;
 			}
 
 			if (m_DrawLink != -1)
@@ -141,7 +136,7 @@ bool Tree::onEvent(Event& ev)
 					mousePos.y > boxPos.y && mousePos.y < boxPos.y + size)
 				{
 					m_Matrix[m_Links[m_DrawLink].m_IDLeft][m_Links[m_DrawLink].m_IDRight] = 0;
-					if (m_Type == TreeType::Unoriented)
+					if (m_Type == GraphType::Unoriented)
 					{
 						m_Matrix[m_Links[m_DrawLink].m_IDRight][m_Links[m_DrawLink].m_IDLeft] = 0;
 					}
@@ -150,7 +145,7 @@ bool Tree::onEvent(Event& ev)
 					recalculateLinks();
 					recalculateGrades();
 
-					return true;
+					return NodeEvent::None;
 				}
 			}
 		}
@@ -160,6 +155,8 @@ bool Tree::onEvent(Event& ev)
 	{
 		auto mp = static_cast<MouseMovedEvent&>(ev);
 		auto pos = Input::WindowToBufferCoordonates(vec2(mp.getX(), mp.getY()));
+
+		NodeEvent returnType = NodeEvent::None;
 
 		bool isMoving = false;
 		if (m_SelectedNode)
@@ -175,6 +172,8 @@ bool Tree::onEvent(Event& ev)
 				std::for_each(m_Links.begin(), m_Links.end(), [&](auto& link) {
 					link.getMiddle();
 					});
+
+				returnType = NodeEvent::Moved;
 			}
 		}
 
@@ -185,12 +184,16 @@ bool Tree::onEvent(Event& ev)
 			if (!isMoving)
 				if (node->isHovered(pos.x, pos.y))
 				{
+					if (!m_Select && found == false)
+					{
+						m_SelectedNode = node;
+						returnType = NodeEvent::Select;
+					}
+
 					if (found == false)
 						found = true;
 					else node->m_isHovered = false;
 
-					if (!m_Select)
-						m_SelectedNode = node;
 				}
 		}
 
@@ -212,19 +215,11 @@ bool Tree::onEvent(Event& ev)
 
 		if (!draw)
 			m_DrawLink = -1;
+
+		return returnType;
 	}
 
-	else if (ev.getType() == EventType::KeyPressed)
-	{
-		auto ke = static_cast<KeyPressedEvent&>(ev).getKeyCode();
-		if (m_InputBox->onKeyDown(ke))
-		{
-			m_SelectedNode->m_Name = m_InputBox->getBuffer();
-			m_SelectedNode->Refresh();
-			return true;
-		}
-	}
-	return false;
+	return NodeEvent::None;
 }
 
 std::shared_ptr<Node>& Tree::getNode(int id)

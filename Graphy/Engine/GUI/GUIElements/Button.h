@@ -1,9 +1,11 @@
 #pragma once
 
+#include "GUI/GUIBase/GUIBaseElement.h"
+
 #include "Maths/Maths.h"
 #include "TextBox.h"
 
-class Button
+class Button : public GUIBaseElement
 {
 public:
 	Button() = default;
@@ -11,15 +13,16 @@ public:
 
 	~Button() = default;
 
-	void Render();
+	void Render() override;
 
-	bool onMousePressed(const vec2& position);
-	bool onMouseMoved(const vec2& position);
+	bool onMousePressed(int x, int y) override;
+	bool onMouseMoved(int x, int y) override;
 
 	void setCallback(const std::function<void()>& func) { m_Callback = func; }
 
-	void setTextSize(int size) { m_TextSize = size; }
-	void setText(const std::string& text, TextAnchorFlags flags);
+	void setTextSize(int size) override { m_TextSize = size; }
+	void setText(const std::string& text, TextAnchorFlags flags) override;
+
 	void setHoverAnimationDist(float dist) { m_HoverDist = dist, m_HoverPosition = m_Position + m_HoverDist; }
 
 	vec3 TextColor;

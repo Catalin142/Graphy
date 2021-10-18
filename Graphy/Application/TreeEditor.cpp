@@ -1,7 +1,9 @@
 #include "Core/GrPch.h"
 #include "TreeEditor.h"
+
 #include "../Graphy/Node.h"
 #include "MainMenu.h"
+#include "TheoryTab.h"
 
 void TreeEditor::onAttach()
 {
@@ -10,40 +12,24 @@ void TreeEditor::onAttach()
 	Subscribe<MouseMovedEvent>();
 	Subscribe<KeyPressedEvent>();
 
-	loadTips("Resources/Editor/Tips.txt");
-
-	m_BufferDim = { (float)Application::Get()->getBuffer()->getWidth(), (float)Application::Get()->getBuffer()->getHeight() };
-
 	std::shared_ptr<Texture> m_ButtonFrame = TextureManager::loadTexture("Resources/Menu/ButtonFrame.spr");
 
-	m_OrientatButton = std::make_shared<Button>(m_ButtonFrame, vec2(m_BufferDim.x / 2.0f - 100.0f, 170.0f), vec2(200.0f, 30.0f));
-	m_OrientatButton->setText("Graf orientat", Center);
-	m_OrientatButton->TextColor = vec3(0.0f, 0.0f, 0.0f);
-	m_OrientatButton->setCallback([&]() -> void {
-		m_GraphType = TreeType::Oriented;
+	GUIManager.Add("Ori", new Button(m_ButtonFrame, vec2(m_BufferDim.x / 2.0f - 100.0f, 170.0f), vec2(200.0f, 30.0f)));
+	GUIManager.Get<Button>("Ori")->setText("Graf orientat", Center);
+	GUIManager.Get<Button>("Ori")->setCallback([&]() -> void {
+		m_GraphType = GraphType::Oriented;
 		m_Graph = std::make_shared<Tree>(m_GraphType);
 
-		createTextBox();
+		InitializeGUI();
 		});
 
-	m_NeoButton = std::make_shared<Button>(m_ButtonFrame, vec2(m_BufferDim.x / 2.0f - 100.0f, 120.0f), vec2(200.0f, 30.0f));
-	m_NeoButton->setText("Graf neorientat", Center);
-	m_NeoButton->TextColor = vec3(0.0f, 0.0f, 0.0f);
-	m_NeoButton->setCallback([&]() -> void {
-		m_GraphType = TreeType::Unoriented;
+	GUIManager.Add("Neo", new Button(m_ButtonFrame, vec2(m_BufferDim.x / 2.0f - 100.0f, 120.0f), vec2(200.0f, 30.0f)));
+	GUIManager.Get<Button>("Neo")->setText("Graf neorientat", Center);
+	GUIManager.Get<Button>("Neo")->setCallback([&]() -> void {
+		m_GraphType = GraphType::Unoriented;
 		m_Graph = std::make_shared<Tree>(m_GraphType);
 
-		createTextBox();
-		});
-
-	m_BackButton = std::make_shared<Button>(m_ButtonFrame, vec2(5.0f, m_BufferDim.y - m_LineOffset - 5.0f -  m_ButtonFrame->getHeight()),
-		vec2(m_ButtonFrame->getWidth(), m_ButtonFrame->getHeight()));
-	m_BackButton->setTextSize(1);
-	m_BackButton->setHoverAnimationDist(2.5f);
-	m_BackButton->setText("Inapoi", Center);
-	m_BackButton->TextColor = vec3(0.0f, 0.0f, 0.0f);
-	m_BackButton->setCallback([&]() -> void {
-		Application::Get()->setLayer(new MainMenu);
+		InitializeGUI();
 		});
 }
 
@@ -51,13 +37,9 @@ void TreeEditor::onUpdate(float deltaTime)
 {
 	Renderer::Clear();
 
-	if (m_GraphType == TreeType::None)
-	{
-		m_NeoButton->Render();
-		m_OrientatButton->Render();
-	}
+	GUIManager.Render();
 
-	else
+	if (m_GraphType != GraphType::None)
 	{
 		if (Input::isPressed('W') && m_Graph->m_SelectedNode)
 		{
@@ -72,11 +54,6 @@ void TreeEditor::onUpdate(float deltaTime)
 
 			m_Graph->m_SelectedNode->m_HoveredColor = m_Graph->m_SelectedNode->m_Color;
 			m_Graph->m_Select = false;
-
-			// Dupa ce selectez un nod sa dau sageata la el si nu misc mouse-ul nu se updateaza nodul selectat asa ca trimit un event sa se updateze
-			auto pt = Input::getMousePosition();
-			MouseMovedEvent ev(pt.x, pt.y);
-			EventDispatcher::Dispatch(ev);
 		}
 
 		if (m_Graph->m_Select)
@@ -93,7 +70,7 @@ void TreeEditor::onUpdate(float deltaTime)
 
 			Renderer::drawLine(linePosBeg, linePosEnd, 2.0f, vec3(0.0f, 0.0f, 0.0f));
 
-			if (m_Graph->m_Type == TreeType::Oriented)
+			if (m_Graph->m_Type == GraphType::Oriented)
 			{
 				rot -= degToRad(30.0f);
 				Renderer::drawLine(linePosEnd, (linePosEnd - vec2(cos(rot), sin(rot)) * 10.0f), 2.0f, vec3(0.0f, 0.0f, 0.0f));
@@ -107,7 +84,7 @@ void TreeEditor::onUpdate(float deltaTime)
 		{
 			m_LastChange = 0.0f;
 			m_CurrentTip++;
-			if (m_CurrentTip > m_Tips[m_GraphType].size() - 1)
+			if (m_CurrentTip > TheoryTab::m_Theory[m_GraphType].size() - 1)
 				m_CurrentTip = 0;
 			setTip();
 		}
@@ -117,7 +94,7 @@ void TreeEditor::onUpdate(float deltaTime)
 			m_LastChange = 0.0f;
 			m_CurrentTip--;
 			if (m_CurrentTip < 0)
-				m_CurrentTip = m_Tips[m_GraphType].size() - 1;
+				m_CurrentTip = TheoryTab::m_Theory[m_GraphType].size() - 1;
 			setTip();
 		}
 
@@ -125,13 +102,11 @@ void TreeEditor::onUpdate(float deltaTime)
 		{
 			m_LastChange = 0.0f; 
 			m_CurrentTip++;
-			if (m_CurrentTip > m_Tips[m_GraphType].size() - 1)
+			if (m_CurrentTip > TheoryTab::m_Theory[m_GraphType].size() - 1)
 				m_CurrentTip = 0;
 			setTip();
 		}
 		m_LastChange += deltaTime;
-
-		m_TipsBox->Render();
 
 		bool state = Input::isPressed(VK_SPACE);
 
@@ -151,54 +126,28 @@ void TreeEditor::onUpdate(float deltaTime)
 
 		if (m_Graph->m_SelectedNode)
 			drawNodeProps();
-
-		m_BackButton->Render();
+		else
+		{
+			GUIManager.Get<InputBox>("Input")->Enable(false);
+		}
 
 		m_Graph->Render();
 		drawMatrix();
 
 		if (m_Graph->m_SelectedNode && GetAsyncKeyState('R') & 0x0001)
 		{
-			m_Graph->m_SelectedNode->m_Name = "";
-			m_Graph->m_InputBox->Activate();
-			m_Graph->m_InputBox->setText("");
+			GUIManager.Get<InputBox>("Input")->Activate();
 		}
 	}
 }
 
 bool TreeEditor::onEvent(Event& ev)
 {
-	if (m_GraphType == TreeType::None)
+	if (m_GraphType == GraphType::None)
 	{
-		if (ev.getType() == EventType::MousePressed)
+		if (GUIManager.onEvent(ev))
 		{
-			auto mp = static_cast<MousePressedEvent&>(ev);
-			vec2 mousePos = Input::WindowToBufferCoordonates(vec2(mp.getX(), mp.getY()));
-
-			if (mp.getMouseCode() == VK_MOUSE_LEFT)
-			{
-				if (m_NeoButton->onMousePressed(mousePos))
-					return true;
-
-				else if (m_OrientatButton->onMousePressed(mousePos))
-					return true;
-			}
-
-			return false;
-		}
-
-		else if (ev.getType() == EventType::MouseMoved)
-		{
-			auto mp = static_cast<MouseMovedEvent&>(ev);
-			vec2 mousePos = Input::WindowToBufferCoordonates(vec2(mp.getX(), mp.getY()));
-
-			if (m_NeoButton->onMouseMoved(mousePos))
-				return true;
-
-			else  if (m_OrientatButton->onMouseMoved(mousePos))
-				return true;
-
-			return false;
+			return true;
 		}
 	}
 
@@ -214,90 +163,60 @@ bool TreeEditor::onEvent(Event& ev)
 			}
 		}
 
-		else if (ev.getType() == EventType::MousePressed)
-		{
-			auto mp = static_cast<MousePressedEvent&>(ev);
-			vec2 mousePos = Input::WindowToBufferCoordonates(vec2(mp.getX(), mp.getY()));
+		else if (GUIManager.onEvent(ev))
+			return true;
 
-			if (mp.getMouseCode() == VK_MOUSE_LEFT)
+		else
+		{
+			auto type = m_Graph->onEvent(ev);
+			if (type != NodeEvent::None)
 			{
-				if (m_BackButton->onMousePressed(mousePos))
+				if (type == NodeEvent::Select)
+				{
+					GUIManager.Get<InputBox>("Input")->setText(m_Graph->m_SelectedNode->m_Name, Center);
+					m_Graph->m_SelectedNode->Refresh();
+
+				}
 					return true;
 			}
 		}
-
-		else if (ev.getType() == EventType::MouseMoved)
-		{
-			auto mp = static_cast<MouseMovedEvent&>(ev);
-			vec2 mousePos = Input::WindowToBufferCoordonates(vec2(mp.getX(), mp.getY()));
-
-			if (m_BackButton->onMouseMoved(mousePos))
-				return true;
-		}
-
-		m_Graph->onEvent(ev);
 	}
 
 	return false;
 }
 
-void TreeEditor::createTextBox()
+void TreeEditor::InitializeGUI()
 {
-	m_TipsBox = std::make_shared<TextBox>(vec3(225.0f / 255.0f, 227.0f / 255.0f, 221.0f / 255.0f),
+	GUIManager.Delete("Neo");
+	GUIManager.Delete("Ori");
+
+	auto fr = TextureManager::loadTexture("Resources/Menu/ButtonFrame.spr");
+	GUIManager.Add("Return", new Button(fr, vec2(5.0f, m_BufferDim.y - m_LineOffset - 5.0f - fr->getHeight()),
+		vec2(fr->getWidth(), fr->getHeight())));
+	GUIManager.Get<Button>("Return")->setTextSize(1);
+	GUIManager.Get<Button>("Return")->setHoverAnimationDist(2.5f);
+	GUIManager.Get<Button>("Return")->setText("Inapoi", Center);
+	GUIManager.Get<Button>("Return")->setCallback([&]() -> void {
+		Application::Get()->setLayer(new MainMenu);
+		});
+
+	GUIManager.Add("Input", new InputBox(vec3(0.6f, 0.6f, 0.6f), 18, 7));
+	GUIManager.Get<InputBox>("Input")->setPosition(m_Graph->m_MatrixPosition + vec2(400.0f, 0.0f) + vec2(Font::getTextWidth("Nod: ") + 1.0f, 0.0f));
+	GUIManager.Get<InputBox>("Input")->setCharacterLimit(3);
+	GUIManager.Get<InputBox>("Input")->setCharacterType(Digit);
+
+	GUIManager.Add("Tips", new TextBox(vec3(225.0f / 255.0f, 227.0f / 255.0f, 221.0f / 255.0f),
 		(m_Graph->m_MatrixPosition.x + 395.0f) - (m_Graph->m_MatrixPosition.x + 7 * 7.0f + 2) - 2,
-		m_LineOffset - 3);
-	m_TipsBox->setPosition({ m_Graph->m_MatrixPosition.x + 7 * 7.0f + 4, m_BufferDim.y - m_LineOffset + 2 });
-	m_TipsBox->setOffset(7, 0);
+		m_LineOffset - 3));
+	GUIManager.Get<TextBox>("Tips")->setPosition({m_Graph->m_MatrixPosition.x + 7 * 7.0f + 4, m_BufferDim.y - m_LineOffset + 2});
+	GUIManager.Get<TextBox>("Tips")->setOffset(7, 0);
 	setTip();
 }
 
 void TreeEditor::setTip()
 {
-	m_TipsBox->setText(m_Tips[m_GraphType][m_CurrentTip], Top | Left, { 0.0f, 0.0f, 0.0f });
-	m_TipsBox->setText(std::to_string(m_CurrentTip + 1) + "\\" + std::to_string(m_Tips[m_GraphType].size()), Bottom | Right, {0.0f, 0.0f, 0.0f}, false);
-}
-
-void TreeEditor::loadTips(const std::string& filepath)
-{
-	std::fstream doc(filepath);
-	if (!doc.good())
-		return;
-	
-	std::string line;
-	std::string def;
-
-	TreeType currentType;
-
-	while (std::getline(doc, line))
-	{
-		if (line.find("Orientat") != std::string::npos)
-		{
-			if (!def.empty())
-				m_Tips[currentType].push_back(def);
-			def.clear();
-			currentType = TreeType::Oriented;
-		}
-		else if (line.find("Neorientat") != std::string::npos) {
-			if (!def.empty())
-				m_Tips[currentType].push_back(def);
-			def.clear();
-			currentType = TreeType::Unoriented;
-		}
-		else
-		{
-			if (line.find("Def:") != std::string::npos)
-			{
-				if (!def.empty())
-					m_Tips[currentType].push_back(def);
-				def.clear();
-			}
-			else
-			{
-				def += line;
-				def += '\n';
-			}
-		}
-	}
+	GUIManager.Get<TextBox>("Tips")->setText(TheoryTab::m_Theory[m_GraphType][m_CurrentTip], Top | Left, { 0.0f, 0.0f, 0.0f });
+	GUIManager.Get<TextBox>("Tips")->setText(std::to_string(m_CurrentTip + 1) + "\\" + std::to_string(TheoryTab::m_Theory[m_GraphType].size()), Bottom | Right, {0.0f, 0.0f, 0.0f}, false);
 }
 
 void TreeEditor::drawMatrix()
@@ -329,9 +248,8 @@ void TreeEditor::drawNodeProps()
 	auto pos = m_Graph->m_MatrixPosition;
 	pos.x += 400.0f;
 
-	m_Graph->m_InputBox->setPosition(pos + vec2(Font::getTextWidth("Nod: ") + 1.0f, 0.0f));
-	m_Graph->m_InputBox->setText(m_Graph->m_SelectedNode->m_Name);
-	m_Graph->m_InputBox->Render();
+	GUIManager.Get<InputBox>("Input")->Enable(true);
+	m_Graph->m_SelectedNode->Refresh();
 
 	Renderer::drawText("Nod: ", pos, 1, { 0.0f, 0.0f, 0.0f });
 	pos.y -= Font::getGlyphHeight();

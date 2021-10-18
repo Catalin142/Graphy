@@ -4,14 +4,15 @@
 
 InputBox::InputBox(const vec3& color, float width, float height) : m_TextBox(std::make_shared<TextBox>(color, width, height)) { }
 
-bool InputBox::onMousePressed(const vec2& pos)
+bool InputBox::onMousePressed(int x, int y)
 {
-	bool pressed = (m_TextBox->m_Position.x + m_TextBox->m_Width > pos.x && m_TextBox->m_Position.x < pos.x &&
-		m_TextBox->m_Position.y + m_TextBox->m_Height > pos.y && m_TextBox->m_Position.y < pos.y);
+	bool pressed = (m_TextBox->m_Position.x + m_TextBox->m_Width > x && m_TextBox->m_Position.x < x &&
+		m_TextBox->m_Position.y + m_TextBox->m_Height > y && m_TextBox->m_Position.y < y);
 
 	if (pressed)
 		m_WaitForInput = true;
-	else m_WaitForInput = false;
+	else
+		m_WaitForInput = false;
 
 	return pressed;
 }
@@ -35,13 +36,13 @@ bool InputBox::onKeyDown(int code)
 
 		else if (c >= -1 && c <= 255 && m_Buffer.size() < m_CharacterLimit)
 		{
-			if (m_ChType & Digit)
+			if (m_CharacterType & Digit)
 			{
 				if (std::isdigit(c))
 					m_Buffer += c;
 			}
 
-			if (m_ChType & Char)
+			if (m_CharacterType & Char)
 			{
 				if (!std::isdigit(c))
 					m_Buffer += c;

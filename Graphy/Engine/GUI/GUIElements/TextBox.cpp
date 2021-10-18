@@ -165,3 +165,8 @@ void TextBox::setText(const std::string& text, int flags, const vec3& color, boo
 		m_SubStrings.push_back({ currentString, Pos });
 	}
 }
+
+void TextBox::setText(const std::string& text)
+{
+	setText(text, m_TextLayout.m_Flags, m_TextLayout.m_Color, true);
+}

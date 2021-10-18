@@ -1,18 +1,11 @@
 #pragma once
 
+#include "GUI/GUIBase/GUIBaseElement.h"
+
 #include "Graphics/Texture.h"
 #include "Graphics/Font.h"
 
-enum TextAnchorFlags
-{
-	Center =	(1 << 0),
-	Left =		(1 << 1),
-	Right =		(1 << 2),
-	Top =		(1 << 3),
-	Bottom =	(1 << 4),
-};
-
-class TextBox
+class TextBox : public GUIBaseElement
 {
 	friend class InputBox;
 
@@ -20,15 +13,16 @@ public:
 	TextBox(const vec3& color, float width, float height);
 	~TextBox() = default;
 
-	void Render();
+	void Render() override;
 
 	void setPosition(const vec2& pos) { m_Position = pos; }
 	void setPosition(int flags);
 
 	void setSize(int width, int height) { m_Width = width; m_Height = height; Refresh(); }
-	void setTextSize(int x) { m_TextLayout.m_TextSize = x; }
+	void setTextSize(int x) override { m_TextLayout.m_TextSize = x; }
 
 	void setText(const std::string& text, int flags, const vec3& color, bool clear = true);
+	void setText(const std::string& text);
 
 	void setOffset(int x, int y) { m_xOffset = x; m_yOffset = y; }
 

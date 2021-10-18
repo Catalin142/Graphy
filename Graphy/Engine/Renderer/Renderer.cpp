@@ -39,9 +39,6 @@ void Renderer::setPixel(const vec2& pos, const vec3& color)
 
 void Renderer::setPixel(const vec2& pos, unsigned long hexColor)
 {
-	if (checkPixel(pos))
-		return;
-
 	int pixel = (int)pos.y * m_Buffer->m_Width + (int)pos.x;
 	*(m_BuffersBuffer + pixel) = hexColor;
 }
@@ -175,12 +172,12 @@ void Renderer::drawLine(const vec2& begin, const vec2& end, float thickness, uns
 {
 	vec2 dt = end - begin;
 	double length = dt.magnitude();
-	vec2 addFactor = dt.normalize();
+	vec2 addFactor = dt.normalize() * thickness;
 
 	dt.x = begin.x;
 	dt.y = begin.y;
 
-	for (double i = 0; i < length; i++)
+	for (double i = 0; i < length / thickness; i++)
 	{
 		drawQuad({ dt.x, dt.y }, { thickness,thickness }, color);
 		dt.x += addFactor.x;
