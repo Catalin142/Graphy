@@ -5,7 +5,7 @@
 
 Texture::Texture(const std::string& filepath) : m_Filepath(filepath)
 {
-	loadTexture(filepath);
+	GR_ASSERT(!loadTexture(filepath), "Textura ", filepath, " nu poate fi gasita");
 }
 
 bool Texture::loadTexture(const std::string& filepath)
@@ -54,6 +54,7 @@ std::shared_ptr<Texture> TextureManager::loadTexture(const std::string& filepath
 	if (m_TextureCache.find(filepath) != m_TextureCache.end())
 		return m_TextureCache[filepath];
 
+	GR_INFO("Alocare in HEAP: ", filepath);
 	std::shared_ptr<Texture> tex = std::make_shared<Texture>(filepath);
 	m_TextureCache[filepath] = tex;
 	return tex;

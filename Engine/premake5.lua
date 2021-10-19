@@ -1,5 +1,5 @@
-project "Graphy"
-	kind "ConsoleApp"
+project "Engine"
+	kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
 	staticruntime "on"
@@ -7,20 +7,19 @@ project "Graphy"
 	targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
 
+	pchheader "Core/GrPch.h"
+	pchsource "Engine/Core/GrPch.cpp"
+
 	includedirs
 	{
-		"%{wks.location}/Engine/Engine",
-	}
-
-	links 
-	{
-		"Engine"
+		"Engine",
 	}
 
 	files
 	{
+		"Engine/**.h",
+		"Engine/**.cpp",
 		"**.cpp",
-		"**.h",
 	}
 
 	filter "system:windows"

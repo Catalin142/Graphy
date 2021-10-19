@@ -113,10 +113,7 @@ Window::Window(const wchar_t* name, u16 width, u16 height, unsigned long flags) 
 		NULL, NULL, hInstance, NULL);
 
 	if (!m_WindowHandle)
-	{
-		std::cout << "Nu s-a putut creea fereastra" << std::endl;
-		assert(m_WindowHandle);
-	}
+		GR_FATAL("Nu s-a putut creea fereastra");
 
 	m_DeviceContext = GetDC(m_WindowHandle);
 

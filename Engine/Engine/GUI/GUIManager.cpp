@@ -13,11 +13,23 @@ GUIM::~GUIM()
 
 void GUIM::Add(const std::string& name, GUIBaseElement* elem)
 {
+	if (m_GUIElements.find(name) != m_GUIElements.end())
+	{
+		GR_WARN(name, " exista deja in GUI");
+		return;
+	}
+
 	m_GUIElements[name] = elem;
 }
 
 void GUIM::Delete(const std::string& element)
 {
+	if (m_GUIElements.find(element) == m_GUIElements.end())
+	{
+		GR_WARN(element, " nu exista in GUI");
+		return;
+	}
+
 	delete m_GUIElements.find(element)->second;
 	m_GUIElements.erase(element);
 }

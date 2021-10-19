@@ -81,7 +81,10 @@ void Font::Init(const std::string& path, const std::string& numbers, const std::
 uint Font::getGlyphWidth(char c)
 {
 	if (!(c >= -1 && c <= 255))
+	{
+		GR_WARNING(c, " nu e disponibil");
 		return 0;
+	}
 
 	if (std::isupper(c))
 		c = tolower(c);
@@ -94,8 +97,8 @@ uint Font::getGlyphWidth(char c)
 
 uint Font::getSymbolOffset(char s)
 {
-	if (m_GlyphSize.find(s) == m_GlyphSize.end())
-		assert(0);
+	GR_ASSERT(m_GlyphSize.find(s) == m_GlyphSize.end(), s, " nu e disponibil");
+
 	int n = 0;
 	switch (s)
 	{
@@ -123,7 +126,10 @@ uint Font::getSymbolOffset(char s)
 uint Font::getTextWidth(const std::string& text)
 {
 	if (text.empty())
+	{
+		GR_WARN("Variabila \"text\" nu are voie sa fie goala");
 		return 0;
+	}
 
 	uint size = 0;
 

@@ -8,4 +8,5 @@ workspace "Graphy"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+include "Engine"
 include "Graphy"

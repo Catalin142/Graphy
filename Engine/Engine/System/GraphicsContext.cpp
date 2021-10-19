@@ -7,6 +7,12 @@ GraphicsContext::GraphicsContext(std::shared_ptr<Window>& window, u32 width, u32
 	m_Width = width;
 	m_Height = height;
 
+	if (width <= 0 || height <= 0)
+	{
+		GR_FATAL("Inaltime si/sau latimea bufferului de culori nu pot fi valori mai mici decat 0");
+		return;
+	}
+
 	setViewport(m_Width, m_Height);
 
 	m_BitMapInfo.bmiHeader.biSize = sizeof(m_BitMapInfo.bmiHeader);
@@ -24,6 +30,12 @@ void GraphicsContext::setViewport(int width, int height)
 {
 	m_Width = width;
 	m_Height = height;
+
+	if (width <= 0 || height <= 0)
+	{
+		GR_FATAL("Inaltime si/sau latimea bufferului de culori nu pot fi valori mai mici decat 0");
+		return;
+	}
 
 	if (m_MemoryBuffer)
 		VirtualFree(m_MemoryBuffer, 0, MEM_RELEASE);

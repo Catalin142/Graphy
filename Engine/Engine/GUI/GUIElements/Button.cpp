@@ -49,6 +49,12 @@ void Button::setText(const std::string& text, TextAnchorFlags flags)
 	m_Text = text;
 	m_Flags = flags;
 
+	if (text.empty())
+	{
+		GR_WARN("Variabila \"text\" nu are voie sa fie goala");
+		return;
+	}
+
 	uint currentTextSize = Font::getTextWidth(m_Text, m_TextSize);
 
 	m_TextPosition = m_Position;

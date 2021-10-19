@@ -30,6 +30,8 @@ void Animation::Play(float deltaTime)
 
 void Animation::Render(const vec2& position, const vec2& size)
 {
+	GR_WARNING(m_Frames.empty(), "Nu exista frameuri in animatie");
+
 	if (m_Frames.size() > 0)
 		Renderer::renderTexture(m_Frames[m_FrameIndex], position, size);
 }

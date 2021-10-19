@@ -54,6 +54,12 @@ void TextBox::setPosition(int flags)
 // Iau fiecare rand din text ii gasesc pozitia si tot ce trebe si dupa il adaug in vector si dupa randez in functia de mai sus  :)
 void TextBox::setText(const std::string& text, int flags, const vec3& color, bool clear)
 {
+	if (text.empty())
+	{
+		GR_WARN("Variabila \"text\" bn are voie sa fie goala");
+		return;
+	}
+
 	vec2 dim = { m_Width, m_Height };
 
 	if (clear)

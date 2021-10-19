@@ -22,7 +22,7 @@ class Application
 
 public:
 	Application(const wchar_t* title, u32 width = 1600, u32 height = 900, u32 bufferWidth = 320, u32 bufferHeight = 200, int flags = WS_OVERLAPPEDWINDOW);
-	virtual ~Application() = default;
+	virtual ~Application();
 
 	void setLayer(Layer* layer);
 

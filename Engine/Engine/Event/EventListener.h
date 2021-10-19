@@ -21,7 +21,8 @@ public:
 	template<typename T>
 	void Subscribe()
 	{
-		static_assert(std::is_base_of<Event, T>::value, "Trebuie sa fie event");
+		bool f = std::is_base_of<Event, T>::value;
+		GR_ASSERT(!f, "Trebuie sa fie event");
 		m_Following[static_cast<int>(T::getStaticType())] = 1;
 	}
 

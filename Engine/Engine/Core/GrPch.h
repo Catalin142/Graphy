@@ -33,3 +33,5 @@
 
 #include <thread>
 #include <future>
+
+#include "Tools/Logger.h"
