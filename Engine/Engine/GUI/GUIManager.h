@@ -7,12 +7,6 @@
 
 #include "Event/Event.h"
 
-enum class GUIType
-{
-	Button,
-	InputBox,
-	TextBox,
-};
 
 class GUIM
 {

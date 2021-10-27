@@ -69,20 +69,20 @@ void Renderer::drawQuad(const vec2& pos, const vec2& size, const vec3& color)
 	drawQuad(pos, size, hexColor);
 }
 
-void Renderer::plotQuad(const vec2& pos, const vec2& size, unsigned long color)
+void Renderer::plotQuad(const vec2& pos, const vec2& size, unsigned long color, float thickness)
 {
-	drawLine(pos, pos + vec2(size.x, 0), color);
-	drawLine(pos, pos + vec2(0, size.y), color);
+	drawLine(pos, pos + vec2(size.x, 0), color, thickness);
+	drawLine(pos, pos + vec2(0, size.y), color, thickness);
 
-	drawLine(pos + vec2(0, size.y - 1), pos + vec2(size.x, size.y), color);
-	drawLine(pos + vec2(size.x - 1, 0), pos + vec2(size.x, size.y), color);
+	drawLine(pos + vec2(0, size.y), pos + vec2(size.x + 1, size.y), color, thickness);
+	drawLine(pos + vec2(size.x, 0), pos + vec2(size.x, size.y), color, thickness);
 }
 
-void Renderer::plotQuad(const vec2& pos, const vec2& size, const vec3& color)
+void Renderer::plotQuad(const vec2& pos, const vec2& size, const vec3& color, float thickness)
 {
 	auto hexColor = createHex(color.r * 255, color.g * 255, color.b * 255);
 
-	plotQuad(pos, size, hexColor);
+	plotQuad(pos, size, hexColor, thickness);
 }
 
 void Renderer::setPixel_s(const vec2& pos, const vec3& color)
@@ -140,35 +140,12 @@ bool Renderer::checkPixel(const vec2& pos)
 }
 
 // Bresenham alg http://members.chello.at/~easyfilter/bresenham.html
-void Renderer::drawLine(const vec2& begin, const vec2& end, const vec3& color)
+void Renderer::drawLine(const vec2& begin, const vec2& end, const vec3& color, float thickness)
 {
-	auto hex = createHex(color);
-	drawLine(begin, end, hex);
+	drawLine(begin, end, createHex(color), thickness);
 }
 
-void Renderer::drawLine(const vec2& begin, const vec2& end, unsigned long color)
-{
-	vec2 dt = end - begin;
-	double length = dt.magnitude();
-	vec2 addFactor = dt.normalize();
-
-	dt.x = begin.x;
-	dt.y = begin.y;
-
-	for (double i = 0; i < length; i++)
-	{
-		setPixel_s({ dt.x, dt.y }, color);
-		dt.x += addFactor.x;
-		dt.y += addFactor.y;
-	}
-}
-
-void Renderer::drawLine(const vec2& begin, const vec2& end, float thickness, const vec3& color)
-{
-	drawLine(begin, end, thickness, createHex(color));
-}
-
-void Renderer::drawLine(const vec2& begin, const vec2& end, float thickness, unsigned long color)
+void Renderer::drawLine(const vec2& begin, const vec2& end, unsigned long color, float thickness)
 {
 	vec2 dt = end - begin;
 	double length = dt.magnitude();

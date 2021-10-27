@@ -140,6 +140,7 @@ uint Font::getTextWidth(const std::string& text)
 		else size += 5;
 	}
 
+	// pun aici spatiul intre caractere, mai putin la ultimul
 	size += text.size() - 1;
 
 	return size;

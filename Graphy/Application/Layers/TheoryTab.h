@@ -17,6 +17,13 @@ public:
 
 private:
 	GraphType m_SelectedType = GraphType::Oriented;
+	int m_Pages = 0;
+	int m_CurrentPage = 0;
+	int m_ItemsOnPage = 4;
 
 	static std::unordered_map<GraphType, std::vector<std::string>> m_Theory;
+	
+private:
+	void Update();
+	void ChangePage(int i);
 };

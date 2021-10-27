@@ -58,15 +58,15 @@ void Tree::Render()
 				vec2 linePosBeg = node->m_Position + dir * node->m_Radius;
 				vec2 linePosEnd = snode->m_Position - dir * snode->m_Radius;
 
-				Renderer::drawLine(linePosBeg, linePosEnd, 2.0f, { 0.0f, 0.0f, 0.0f });
+				Renderer::drawLine(linePosBeg, linePosEnd, { 0.0f, 0.0f, 0.0f }, 2.0f);
 
 				if (m_Type == GraphType::Oriented)
 				{
 					rot -= degToRad(30.0f);
-					Renderer::drawLine(linePosEnd, (linePosEnd - vec2(cos(rot), sin(rot)) * 10.0f), 2.0f, { 0.0f, 0.0f, 0.0f });
+					Renderer::drawLine(linePosEnd, (linePosEnd - vec2(cos(rot), sin(rot)) * 10.0f), { 0.0f, 0.0f, 0.0f }, 2.0f);
 
 					rot += degToRad(60.0f);
-					Renderer::drawLine(linePosEnd, (linePosEnd - vec2(cos(rot), sin(rot)) * 10.0f), 2.0f, { 0.0f, 0.0f, 0.0f });
+					Renderer::drawLine(linePosEnd, (linePosEnd - vec2(cos(rot), sin(rot)) * 10.0f), { 0.0f, 0.0f, 0.0f }, 2.0f);
 				}
 			}
 		}
@@ -186,7 +186,13 @@ NodeEvent Tree::onEvent(Event& ev)
 				{
 					if (!m_Select && found == false)
 					{
-						m_SelectedNode = node;
+						if (m_SelectedNode != node)
+						{
+							if (m_SelectedNode)
+								m_SelectedNode->m_Color = { 0.0f, 0.0f, 0.0f };
+							m_SelectedNode = node;
+						}
+
 						returnType = NodeEvent::Select;
 					}
 

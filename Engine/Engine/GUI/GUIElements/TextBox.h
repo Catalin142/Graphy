@@ -20,9 +20,10 @@ public:
 
 	void setSize(int width, int height) { m_Width = width; m_Height = height; Refresh(); }
 	void setTextSize(int x) override { m_TextLayout.m_TextSize = x; }
+	void setTextPosition(int flags) { m_TextLayout.m_Flags = flags; }
 
 	void setText(const std::string& text, int flags, const vec3& color, bool clear = true);
-	void setText(const std::string& text);
+	void setText(const std::string& text, bool clear = true);
 
 	void setOffset(int x, int y) { m_xOffset = x; m_yOffset = y; }
 

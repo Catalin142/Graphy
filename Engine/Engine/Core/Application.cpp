@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "Renderer/Renderer.h"
 #include "Graphics/Font.h"
+#include "System/Input.h"
 
 Application* Application::m_Instance;
 float Time::deltaTime = 0.0f;
@@ -22,7 +23,6 @@ Application::~Application()
 	if (m_CurrentLayer)
 	{
 		m_CurrentLayer->onDetach();
-		GR_INFO("Sterg layerul");
 		delete m_CurrentLayer;
 	}
 
@@ -31,14 +31,12 @@ Application::~Application()
 
 void Application::setLayer(Layer* layer)
 {
+	Input::blockInput(false);
 	if (m_CurrentLayer)
 	{
 		m_CurrentLayer->onDetach();
-		GR_INFO("Sterg layerul");
 		delete m_CurrentLayer;
 	}
-
-	GR_INFO("Schimb layerul");
 	
 	m_CurrentLayer = layer;
 	m_CurrentLayer->onAttach();
@@ -63,8 +61,9 @@ void Application::Run()
 			lastFrameChange = 0.0f;
 		} // TODO(cata): scoatel
 
-		if (m_CurrentLayer->m_Active)
-			m_CurrentLayer->onUpdate(Time::deltaTime);
+		if (GetFocus() == m_Window->getHandle())
+			if (m_CurrentLayer->m_Active)
+				m_CurrentLayer->onUpdate(Time::deltaTime);
 
 		Renderer::Draw();
 

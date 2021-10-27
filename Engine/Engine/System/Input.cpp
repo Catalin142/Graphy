@@ -8,9 +8,9 @@ bool Input::m_InputBlocked = false;
 
 bool Input::isPressed(int code)
 {
-	if (!m_InputBlocked)
-		return GetAsyncKeyState(code);
-	else return false;
+	if (m_InputBlocked)
+		return false;
+	return GetAsyncKeyState(code);
 }
 
 vec2 Input::getMousePosition()

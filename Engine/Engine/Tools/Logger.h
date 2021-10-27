@@ -41,7 +41,7 @@ static void INTERNAL_LOG(int level, const args& ...argv)
 #define GR_ERROR(...) { INTERNAL_LOG(ERROR,   "EROARE:",					 __VA_ARGS__); DebugBreak(); }
 #define GR_FATAL(...) { INTERNAL_LOG(FATAL,   "EROARE FATALA:",			 __VA_ARGS__); abort(); }
 
-#define GR_ASSERT(x, ...) {if (x) GR_ERROR(__VA_ARGS__); }
+#define GR_ASSERT(x, ...) {if (x) {GR_ERROR(__VA_ARGS__); assert(0);} }
 #define GR_WARNING(x, ...) {if (x) GR_WARN(__VA_ARGS__); }
 
 

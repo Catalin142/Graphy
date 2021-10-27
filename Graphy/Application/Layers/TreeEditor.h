@@ -3,8 +3,9 @@
 #include "Core/Layer.h"
 #include "Core/Application.h"
 #include "Renderer/Renderer.h"
-#include "../Graphy/Tree.h"
+#include "../../Graphy/Tree.h"
 #include "System/Input.h"
+#include "../Manager.h"
 
 class TreeEditor : public Layer
 {
@@ -13,17 +14,24 @@ public:
 	void onUpdate(float deltaTime) override;
 	bool onEvent(Event& ev) override;
 
+	void setTree(const std::string& name) { m_Graph = TreeManager::Get()[name]; m_TreeName = name; }
+
 private:
 	std::shared_ptr<Tree> m_Graph;
-	GraphType m_GraphType = GraphType::None;
 
 	int m_LineOffset = 55.0f;
 
 	bool m_SpaceState = true;
+	bool m_RState = true;
 
 	int m_CurrentTip = 0;
 	float m_ChangeInterval = 7.0f;
 	float m_LastChange = 0.0f;
+
+	std::string m_TreeName = "";
+	std::string m_NodeName = "";
+
+	bool m_GUIInitialized = false;
 	
 private:
 	void InitializeGUI();

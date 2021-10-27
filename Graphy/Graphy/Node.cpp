@@ -46,6 +46,6 @@ bool Node::isHovered(int x, int y)
 void Node::Refresh()
 {
 	int textSize = Font::getTextWidth(m_Name, m_TextSize);
-	m_TextPosition.x = m_Position.x - textSize / 2.0f;
+	m_TextPosition.x = m_Position.x - (float)(textSize / 2.0f);
 	m_TextPosition.y = m_Position.y - (Font::getGlyphHeight() * m_TextSize) / 2.0f;
 }

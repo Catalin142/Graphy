@@ -5,6 +5,7 @@ enum EventType
 	MousePressed,
 	MouseMoved,
 	MouseReleased,
+	MouseScroll,
 
 	KeyPressed,
 };
@@ -80,6 +81,19 @@ private:
 	int m_MouseY;
 
 	int m_MouseCode;
+};
+
+class MouseScrollEvent : public Event
+{
+public:
+	MouseScrollEvent(int dy): m_DY(dy), Event(EventType::MouseScroll) {}
+
+	static EventType getStaticType() { return EventType::MouseScroll; }
+
+	int getDelta() { return m_DY; }
+
+private:
+	int m_DY;
 };
 
 class KeyPressedEvent : public Event

@@ -13,7 +13,6 @@ enum class GraphType
 	None,
 	Oriented,
 	Unoriented,
-	Graph,
 };
 
 enum class NodeEvent
@@ -29,6 +28,9 @@ enum class NodeEvent
 class Tree
 {
 	friend class TreeEditor;
+	friend class TreeManager;
+
+	friend void Write(std::ofstream& str, const std::shared_ptr<Tree>& data);
 
 public:
 	Tree(GraphType type);

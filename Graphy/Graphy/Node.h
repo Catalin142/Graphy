@@ -7,7 +7,9 @@ class Node
 {
 	friend class Tree;
 	friend class TreeEditor;
-	friend class GraphEditor;
+	friend class GraphReader;
+
+	friend void Write(std::ofstream& str, const std::shared_ptr<Node>& data);
 
 public:
 	Node(int id, const std::string& number, const vec2& position, int radius);
@@ -19,6 +21,7 @@ private:
 
 	bool isPressed(int x, int y);
 	bool isHovered(int x, int y);
+	bool isHovered() { return m_isHovered; }
 
 	void Refresh();
 

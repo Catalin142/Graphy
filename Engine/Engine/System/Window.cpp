@@ -78,6 +78,15 @@ static LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 		EventDispatcher::Dispatch(ev);
 	} break;
 
+	case WM_MOUSEWHEEL:
+	{
+		int dy;
+		dy = GET_WHEEL_DELTA_WPARAM(wParam);
+
+		MouseScrollEvent ev(dy);
+		EventDispatcher::Dispatch(ev);
+	} break;
+
 	case WM_CLOSE:
 	{
 		DestroyWindow(hwnd);

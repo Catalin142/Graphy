@@ -26,7 +26,6 @@ void GUIM::Delete(const std::string& element)
 {
 	if (m_GUIElements.find(element) == m_GUIElements.end())
 	{
-		GR_WARN(element, " nu exista in GUI");
 		return;
 	}
 
@@ -76,4 +75,6 @@ bool GUIM::onEvent(Event& ev)
 
 		return false;
 	}
+
+	return false;
 }

@@ -18,14 +18,11 @@ public:
 	static void drawQuad(const vec2& pos, const vec2& size, const vec3& color);
 	static void drawQuad(const vec2& pos, const vec2& size, unsigned long color);
 
-	static void plotQuad(const vec2& pos, const vec2& size, const vec3& color);
-	static void plotQuad(const vec2& pos, const vec2& size, unsigned long color);
+	static void plotQuad(const vec2& pos, const vec2& size, const vec3& color, float thickness = 1.0f);
+	static void plotQuad(const vec2& pos, const vec2& size, unsigned long color, float thickness = 1.0f);
 
-	static void drawLine(const vec2& begin, const vec2& end, const vec3& color);
-	static void drawLine(const vec2& begin, const vec2& end, unsigned long color);	
-	
-	static void drawLine(const vec2& begin, const vec2& end,float thickness, const vec3& color);
-	static void drawLine(const vec2& begin, const vec2& end,float thickness, unsigned long color);
+	static void drawLine(const vec2& begin, const vec2& end, const vec3& color, float thickness = 1.0f);
+	static void drawLine(const vec2& begin, const vec2& end, unsigned long color, float thickness = 1.0f);
 
 	static void drawCircle(const vec2& pos, float radius, const vec3& color);
 	static void plotCircle(const vec2& pos, float radius, const vec3& color);

@@ -15,10 +15,9 @@ enum CharacterType
 class InputBox : public GUIBaseElement
 {
 public:
-	InputBox(const vec3& color, float width, float height);
+	InputBox(std::string& buffer, const vec3& color, float width, float height);
 
-	void Activate();
-	void Deactivate();
+	void Activate(bool l);
 
 	void Render() override;
 
@@ -32,14 +31,18 @@ public:
 
 	void setTextAnchor(int flag) { m_Flags = flag; }
 	void setCharacterLimit(int l) { m_CharacterLimit = l; }
-	void setCharacterType(CharacterType type) { m_CharacterType = int(type); }
+	void setCharacterType(int type) { m_CharacterType = type; }
+	void setDefaultText(const std::string& tx) { m_DefaultText = tx; m_TextBox->setText(m_DefaultText, m_Flags, m_TextBox->m_TextLayout.m_Color); }
 
 	const std::string& getBuffer() const { return m_Buffer; }
 	int getBufferSize() { return m_TextBox->m_Text.size(); }
 
+	bool isActive() { return m_WaitForInput; }
+
 private:
 	bool m_WaitForInput = false;
-	std::string m_Buffer = "";
+	std::string& m_Buffer;
+	std::string m_DefaultText = "";
 
 	int m_Flags = Center;
 	int m_CharacterType = Char | Digit;

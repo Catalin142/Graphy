@@ -1,9 +1,12 @@
 #include "Core/GrPch.h"
 #include "TreeEditor.h"
 
-#include "../Graphy/Node.h"
+#include "../../Graphy/Node.h"
 #include "MainMenu.h"
 #include "TheoryTab.h"
+
+#include "../Tools/TreeSerializer.h"
+#include "../Manager.h"
 
 void TreeEditor::onAttach()
 {
@@ -12,25 +15,30 @@ void TreeEditor::onAttach()
 	Subscribe<MouseMovedEvent>();
 	Subscribe<KeyPressedEvent>();
 
-	std::shared_ptr<Texture> m_ButtonFrame = TextureManager::loadTexture("Resources/Menu/ButtonFrame.spr");
+	if (!m_Graph)
+	{
+		std::shared_ptr<Texture> m_ButtonFrame = TextureManager::loadTexture("Resources/Menu/ButtonFrame.spr");
 
-	GUIManager.Add("Ori", new Button(m_ButtonFrame, vec2(m_BufferDim.x / 2.0f - 100.0f, 170.0f), vec2(200.0f, 30.0f)));
-	GUIManager.Get<Button>("Ori")->setText("Graf orientat", Center);
-	GUIManager.Get<Button>("Ori")->setCallback([&]() -> void {
-		m_GraphType = GraphType::Oriented;
-		m_Graph = std::make_shared<Tree>(m_GraphType);
+		GUIManager.Add("Name", new InputBox(m_TreeName, { 0.6f, 0.6f, 0.6f }, 120.0f, 20.0f));
+		GUIManager.Get<InputBox>("Name")->setCharacterLimit(16);
+		GUIManager.Get<InputBox>("Name")->setCharacterType(Char | Digit);
+		GUIManager.Get<InputBox>("Name")->setPosition({ m_BufferDim.x / 2.0f - 60.0f, 230.0f });
+		GUIManager.Get<InputBox>("Name")->setDefaultText("Introdu numele grafului");
 
-		InitializeGUI();
-		});
+		GUIManager.Add("Ori", new Button(m_ButtonFrame, vec2(m_BufferDim.x / 2.0f - 100.0f, 170.0f), vec2(200.0f, 30.0f)));
+		GUIManager.Get<Button>("Ori")->setText("Graf orientat", Center);
+		GUIManager.Get<Button>("Ori")->setCallback([&]() -> void {
+			if (!m_TreeName.empty() && TreeManager::Get().find(m_TreeName) == TreeManager::Get().end())
+				m_Graph = std::make_shared<Tree>(GraphType::Oriented);
+			});
 
-	GUIManager.Add("Neo", new Button(m_ButtonFrame, vec2(m_BufferDim.x / 2.0f - 100.0f, 120.0f), vec2(200.0f, 30.0f)));
-	GUIManager.Get<Button>("Neo")->setText("Graf neorientat", Center);
-	GUIManager.Get<Button>("Neo")->setCallback([&]() -> void {
-		m_GraphType = GraphType::Unoriented;
-		m_Graph = std::make_shared<Tree>(m_GraphType);
-
-		InitializeGUI();
-		});
+		GUIManager.Add("Neo", new Button(m_ButtonFrame, vec2(m_BufferDim.x / 2.0f - 100.0f, 120.0f), vec2(200.0f, 30.0f)));
+		GUIManager.Get<Button>("Neo")->setText("Graf neorientat", Center);
+		GUIManager.Get<Button>("Neo")->setCallback([&]() -> void {
+			if (!m_TreeName.empty() && TreeManager::Get().find(m_TreeName) == TreeManager::Get().end())
+				m_Graph = std::make_shared<Tree>(GraphType::Unoriented);
+			});
+	}
 }
 
 void TreeEditor::onUpdate(float deltaTime)
@@ -39,8 +47,18 @@ void TreeEditor::onUpdate(float deltaTime)
 
 	GUIManager.Render();
 
-	if (m_GraphType != GraphType::None)
+	if (m_Graph)
 	{
+		if (!m_GUIInitialized)
+		{
+			InitializeGUI();
+			m_GUIInitialized = true;
+		}
+
+		if (Input::isPressed(VK_CONTROL))
+			if (Input::isPressed('S'))
+				TreeManager::saveTree(m_TreeName, m_Graph);
+
 		if (Input::isPressed('W') && m_Graph->m_SelectedNode)
 		{
 			m_Graph->m_SelectedNode->m_HoveredColor = vec3(1.0f, 0.0f, 0.0f);
@@ -68,15 +86,15 @@ void TreeEditor::onUpdate(float deltaTime)
 			vec2 linePosBeg = m_Graph->m_SelectedNode->m_Position + dir * m_Graph->m_SelectedNode->m_Radius;
 			vec2 linePosEnd = mousePos;
 
-			Renderer::drawLine(linePosBeg, linePosEnd, 2.0f, vec3(0.0f, 0.0f, 0.0f));
+			Renderer::drawLine(linePosBeg, linePosEnd, vec3(0.0f, 0.0f, 0.0f), 2.0f);
 
 			if (m_Graph->m_Type == GraphType::Oriented)
 			{
 				rot -= degToRad(30.0f);
-				Renderer::drawLine(linePosEnd, (linePosEnd - vec2(cos(rot), sin(rot)) * 10.0f), 2.0f, vec3(0.0f, 0.0f, 0.0f));
+				Renderer::drawLine(linePosEnd, (linePosEnd - vec2(cos(rot), sin(rot)) * 10.0f), vec3(0.0f, 0.0f, 0.0f), 2.0f);
 
 				rot += degToRad(60.0f);
-				Renderer::drawLine(linePosEnd, (linePosEnd - vec2(cos(rot), sin(rot)) * 10.0f), 2.0f, vec3(0.0f, 0.0f, 0.0f));
+				Renderer::drawLine(linePosEnd, (linePosEnd - vec2(cos(rot), sin(rot)) * 10.0f), vec3(0.0f, 0.0f, 0.0f), 2.0f);
 			}
 		}
 
@@ -84,7 +102,7 @@ void TreeEditor::onUpdate(float deltaTime)
 		{
 			m_LastChange = 0.0f;
 			m_CurrentTip++;
-			if (m_CurrentTip > TheoryTab::m_Theory[m_GraphType].size() - 1)
+			if (m_CurrentTip > TheoryTab::m_Theory[m_Graph->m_Type].size() - 1)
 				m_CurrentTip = 0;
 			setTip();
 		}
@@ -94,7 +112,7 @@ void TreeEditor::onUpdate(float deltaTime)
 			m_LastChange = 0.0f;
 			m_CurrentTip--;
 			if (m_CurrentTip < 0)
-				m_CurrentTip = TheoryTab::m_Theory[m_GraphType].size() - 1;
+				m_CurrentTip = TheoryTab::m_Theory[m_Graph->m_Type].size() - 1;
 			setTip();
 		}
 
@@ -102,7 +120,7 @@ void TreeEditor::onUpdate(float deltaTime)
 		{
 			m_LastChange = 0.0f; 
 			m_CurrentTip++;
-			if (m_CurrentTip > TheoryTab::m_Theory[m_GraphType].size() - 1)
+			if (m_CurrentTip > TheoryTab::m_Theory[m_Graph->m_Type].size() - 1)
 				m_CurrentTip = 0;
 			setTip();
 		}
@@ -134,24 +152,33 @@ void TreeEditor::onUpdate(float deltaTime)
 		m_Graph->Render();
 		drawMatrix();
 
-		if (m_Graph->m_SelectedNode && GetAsyncKeyState('R') & 0x0001)
+		bool rstate = Input::isPressed('R');
+		if (m_Graph->m_SelectedNode && (rstate != m_RState && rstate == true))
 		{
-			GUIManager.Get<InputBox>("Input")->Activate();
+			GUIManager.Get<InputBox>("Input")->Activate(!GUIManager.Get<InputBox>("Input")->isActive());
+			m_RState = true;
+		}
+		else if (rstate == false) m_RState = false;
+
+		if (m_Graph->m_SelectedNode)
+		{
+			if (GUIManager.Get<InputBox>("Input")->isActive())
+			{
+				m_Graph->m_SelectedNode->m_Color = { 0.5f, 0.05f, 0.0f };
+				m_Graph->m_SelectedNode->m_Name = m_NodeName;
+				m_Graph->m_SelectedNode->Refresh();
+			}
+			else
+			{
+				m_Graph->m_SelectedNode->m_Color = { 0.0f, 0.0f, 0.0f };
+			}
 		}
 	}
 }
 
 bool TreeEditor::onEvent(Event& ev)
 {
-	if (m_GraphType == GraphType::None)
-	{
-		if (GUIManager.onEvent(ev))
-		{
-			return true;
-		}
-	}
-
-	else
+	if (m_Graph)
 	{
 		if (ev.getType() == EventType::MouseReleased)
 		{
@@ -182,13 +209,23 @@ bool TreeEditor::onEvent(Event& ev)
 		}
 	}
 
+	else
+	{
+		if (GUIManager.onEvent(ev))
+		{
+			return true;
+		}
+	}
+
 	return false;
 }
 
 void TreeEditor::InitializeGUI()
 {
+	Input::blockInput(false);
 	GUIManager.Delete("Neo");
 	GUIManager.Delete("Ori");
+	GUIManager.Delete("Name");
 
 	auto fr = TextureManager::loadTexture("Resources/Menu/ButtonFrame.spr");
 	GUIManager.Add("Return", new Button(fr, vec2(5.0f, m_BufferDim.y - m_LineOffset - 5.0f - fr->getHeight()),
@@ -200,7 +237,7 @@ void TreeEditor::InitializeGUI()
 		Application::Get()->setLayer(new MainMenu);
 		});
 
-	GUIManager.Add("Input", new InputBox(vec3(0.6f, 0.6f, 0.6f), 18, 7));
+	GUIManager.Add("Input", new InputBox(m_NodeName, vec3(0.6f, 0.6f, 0.6f), 18, 7));
 	GUIManager.Get<InputBox>("Input")->setPosition(m_Graph->m_MatrixPosition + vec2(400.0f, 0.0f) + vec2(Font::getTextWidth("Nod: ") + 1.0f, 0.0f));
 	GUIManager.Get<InputBox>("Input")->setCharacterLimit(3);
 	GUIManager.Get<InputBox>("Input")->setCharacterType(Digit);
@@ -211,12 +248,14 @@ void TreeEditor::InitializeGUI()
 	GUIManager.Get<TextBox>("Tips")->setPosition({m_Graph->m_MatrixPosition.x + 7 * 7.0f + 4, m_BufferDim.y - m_LineOffset + 2});
 	GUIManager.Get<TextBox>("Tips")->setOffset(7, 0);
 	setTip();
+
+	m_Graph->m_SelectedNode = nullptr;
 }
 
 void TreeEditor::setTip()
 {
-	GUIManager.Get<TextBox>("Tips")->setText(TheoryTab::m_Theory[m_GraphType][m_CurrentTip], Top | Left, { 0.0f, 0.0f, 0.0f });
-	GUIManager.Get<TextBox>("Tips")->setText(std::to_string(m_CurrentTip + 1) + "\\" + std::to_string(TheoryTab::m_Theory[m_GraphType].size()), Bottom | Right, {0.0f, 0.0f, 0.0f}, false);
+	GUIManager.Get<TextBox>("Tips")->setText(TheoryTab::m_Theory[m_Graph->m_Type][m_CurrentTip], Top | Left, { 0.0f, 0.0f, 0.0f });
+	GUIManager.Get<TextBox>("Tips")->setText(std::to_string(m_CurrentTip + 1) + "\\" + std::to_string(TheoryTab::m_Theory[m_Graph->m_Type].size()), Bottom | Right, {0.0f, 0.0f, 0.0f}, false);
 }
 
 void TreeEditor::drawMatrix()

@@ -7,9 +7,12 @@
 
 class Button : public GUIBaseElement
 {
+	friend class ButtonPanel;
+
 public:
 	Button() = default;
 	Button(const std::shared_ptr<Texture>& tex, const vec2& position, const vec2& size);
+	Button(const vec3 color, const vec2& position, const vec2& size);
 
 	~Button() = default;
 
@@ -18,10 +21,16 @@ public:
 	bool onMousePressed(int x, int y) override;
 	bool onMouseMoved(int x, int y) override;
 
+	bool isHovered(int x, int y);
+
 	void setCallback(const std::function<void()>& func) { m_Callback = func; }
 
 	void setTextSize(int size) override { m_TextSize = size; }
 	void setText(const std::string& text, TextAnchorFlags flags) override;
+
+	void setSize(int width, int height);
+	void setPosition(float x, float y);
+	void setBorderColor(const vec3& color) { m_BorderColor = color; }
 
 	void setHoverAnimationDist(float dist) { m_HoverDist = dist, m_HoverPosition = m_Position + m_HoverDist; }
 
@@ -29,6 +38,8 @@ public:
 
 private:
 	std::shared_ptr<Texture> m_Frame;
+	vec3 m_Color;
+	vec3 m_BorderColor = { -1.0f, -1.0f, -1.0f };
 
 	int m_Flags;
 	std::string m_Text;
@@ -44,4 +55,7 @@ private:
 	vec2 m_PixelDimensions;
 
 	std::function<void()> m_Callback;
+
+private:
+	void Refresh();
 };
