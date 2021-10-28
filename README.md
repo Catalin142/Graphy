@@ -11,5 +11,5 @@ Tab (in main menu): load tree menu
 Romanian
 
 # Screenshots
-![ss1](Screeshots/SS1.png)
-![ss2](Screeshots/SS2.png)
+![ss1](Screenshots/SS1.png)
+![ss2](Screenshots/SS2.png)
