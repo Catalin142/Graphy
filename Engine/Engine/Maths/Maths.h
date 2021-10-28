@@ -75,7 +75,8 @@ static unsigned long createHex(int r, int g, int b)
 // 0xrrggbb
 static unsigned long createHex(const vec3& color)
 {
-	return (int(color.r * 255) << 16 | int(color.g * 255) << 8 | int(color.b * 255));
+	volatile unsigned long i = int(color.r * 255) << 16 | int(color.g * 255) << 8 | int(color.b * 255);
+	return i;
 }
 
 static vec3 createRGB(unsigned long hex)

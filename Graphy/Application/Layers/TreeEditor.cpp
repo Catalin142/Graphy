@@ -173,6 +173,9 @@ void TreeEditor::onUpdate(float deltaTime)
 				m_Graph->m_SelectedNode->m_Color = { 0.0f, 0.0f, 0.0f };
 			}
 		}
+
+		if (TreeManager::Get().find(m_TreeName) == TreeManager::Get().end())
+			Renderer::drawText("Nu-i salvat!", { 405.0f,  m_BufferDim.y - m_LineOffset + 2.0f}, 1, { 1.0f, 0.0f, 0.0f });
 	}
 }
 
@@ -300,5 +303,5 @@ void TreeEditor::drawNodeProps()
 	pos.y -= Font::getGlyphHeight();
 
 	Renderer::drawText("Grad exterior: " + std::to_string(m_Graph->m_SelectedNode->m_ExternalDegree), pos, 1, { 0.0f, 0.0f, 0.0f });
-	pos.y -= Font::getGlyphHeight();
+	pos.y -= Font::getGlyphHeight() * 2.0f;
 }

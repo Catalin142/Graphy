@@ -110,6 +110,8 @@ NodeEvent Tree::onEvent(Event& ev)
 							if (m_Type == GraphType::Unoriented)
 								m_Matrix[node->m_ID][m_SelectedNode->m_ID] = 1;
 
+							m_SelectedNode = node;
+
 							recalculateGrades();
 							recalculateLinks();
 							return NodeEvent::Link;

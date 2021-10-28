@@ -129,3 +129,9 @@ void ButtonPanel::Clear()
 	m_Buttons.clear();
 	m_ButtonPosition = { m_Position.x + m_Size.x / 2.0f - m_ButtonSize.x / 2.0f, m_Position.y + m_Size.y - m_ButtonSize.y - 10.0f };
 }
+
+void ButtonPanel::Refesh()
+{
+	m_SelectedIndex = -1;
+	m_ActiveItem = -1;
+}

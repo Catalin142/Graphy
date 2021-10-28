@@ -41,4 +41,5 @@ private:
 
 private:
 	void Refresh();
+	void ChangeTab();
 };

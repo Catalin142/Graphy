@@ -7,7 +7,8 @@ std::unordered_map<std::string, std::shared_ptr<Tree>> TreeManager::m_Trees;
 
 void TreeManager::saveTree(const std::string& name, const std::shared_ptr<Tree>& tree)
 {
-	m_Trees[name] = tree;
+	if (m_Trees.find(name) == m_Trees.end())
+		m_Trees.insert(std::pair(name, tree));
 	Serialize("graf.gf");
 }
 

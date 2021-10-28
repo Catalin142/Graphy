@@ -52,4 +52,7 @@ static void INTERNAL_LOG(int level, const args& ...argv)
 #define GR_ERROR(...)
 #define GR_FATAL(...)
 
+#define GR_ASSERT(x, ...) {if (x) {GR_ERROR(__VA_ARGS__); assert(0);} }
+#define GR_WARNING(x, ...) {if (x) GR_WARN(__VA_ARGS__); }
+
 #endif

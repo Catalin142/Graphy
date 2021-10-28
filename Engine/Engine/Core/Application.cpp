@@ -47,19 +47,10 @@ void Application::Run()
 	std::chrono::time_point<std::chrono::system_clock> timeNow = std::chrono::system_clock::now();
 	std::chrono::time_point<std::chrono::system_clock> oldTime = timeNow;
 
-	float lastFrameChange = 0.4f;
-
 	while (m_Window->isRunning())
 	{
 		timeNow = std::chrono::system_clock::now();
 		Time::deltaTime = std::chrono::duration<float>(timeNow - oldTime).count();
-
-		if (lastFrameChange >= 0.5f)
-		{
-			std::wstring title = m_Window->getName() + L": FPS " + std::to_wstring(int(1 / Time::deltaTime));
-			SetWindowText(m_Window->getHandle(), title.c_str());
-			lastFrameChange = 0.0f;
-		} // TODO(cata): scoatel
 
 		if (GetFocus() == m_Window->getHandle())
 			if (m_CurrentLayer->m_Active)
@@ -67,12 +58,7 @@ void Application::Run()
 
 		Renderer::Draw();
 
-		lastFrameChange += Time::deltaTime;
-
 		m_Window->pollEvents();
-
-		if (GetAsyncKeyState(VK_ESCAPE))
-			m_Window->isRunning() = false; // TODO(cata): scoatel
 
 		oldTime = timeNow;
 	}

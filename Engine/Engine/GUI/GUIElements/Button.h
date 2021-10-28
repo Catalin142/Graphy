@@ -34,7 +34,7 @@ public:
 
 	void setHoverAnimationDist(float dist) { m_HoverDist = dist, m_HoverPosition = m_Position + m_HoverDist; }
 
-	vec3 TextColor;
+	vec3 TextColor = vec3(0.0f, 0.0f, 0.0f);
 
 private:
 	std::shared_ptr<Texture> m_Frame;

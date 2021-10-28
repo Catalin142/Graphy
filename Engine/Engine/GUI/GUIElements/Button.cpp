@@ -15,7 +15,7 @@ void Button::Render()
 	if (m_Position == m_HoverPosition)
 	{
 		if (m_Frame)
-			Renderer::renderTexture(m_Frame, m_NormalPosition, m_PixelDimensions, { 0.0f, 0.0f, 0.0f });
+			Renderer::renderTexture(m_Frame, m_NormalPosition, m_PixelDimensions, vec3(0.0f, 0.0f, 0.0f));
 		else
 		{
 			Renderer::drawQuad(m_NormalPosition, m_PixelDimensions, m_Color);

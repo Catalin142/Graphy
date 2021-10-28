@@ -36,7 +36,14 @@ void MainMenu::onAttach()
         Application::Get()->setLayer(new TreeEditor);
         });
 
-    GUIManager.Add("Teorie", new Button(m_ButtonFrame, vec2(85.0f, 80.0f), vec2(200.0f, 30.0f)));
+    GUIManager.Add("Tab", new Button(m_ButtonFrame, vec2(85.0f, 80.0f), vec2(200.0f, 30.0f)));
+    GUIManager.Get<Button>("Tab")->setText("Deschide graf", Center);
+    GUIManager.Get<Button>("Tab")->setCallback([&]() -> void {
+        m_SelectionMenu = true;
+        ChangeTab();
+        });
+
+    GUIManager.Add("Teorie", new Button(m_ButtonFrame, vec2(85.0f, 40.0f), vec2(200.0f, 30.0f)));
     GUIManager.Get<Button>("Teorie")->setText("Teorie", Center);
     GUIManager.Get<Button>("Teorie")->setCallback([]() -> void {
         Application::Get()->setLayer(new TheoryTab);
@@ -51,6 +58,7 @@ void MainMenu::onAttach()
         {
             TreeManager::deleteTree(m_SelectedItem);
             m_ButtonPanel->Clear();
+            m_ButtonPanel->Refesh();
             Refresh();
 
             m_SelectedItem.clear();
@@ -75,6 +83,17 @@ void MainMenu::onAttach()
         });
     GUIManager.Get<Button>("Load")->Enable(false);
 
+    GUIManager.Add("Back", new Button(vec3(0.7f, 0.7f, 0.7f), vec2(5.0f, m_BufferDim.y - 13.0f), vec2(45.0f, 8.0f)));
+    GUIManager.Get<Button>("Back")->setTextSize(1);
+    GUIManager.Get<Button>("Back")->setText("Inapoi", Center);
+    GUIManager.Get<Button>("Back")->setHoverAnimationDist(1.0f);
+    GUIManager.Get<Button>("Back")->setBorderColor({ 0.0f, 0.0f, 0.0f });
+    GUIManager.Get<Button>("Back")->setCallback([&]() -> void {
+        m_SelectionMenu = false;
+        ChangeTab();
+        });
+    GUIManager.Get<Button>("Back")->Enable(false);
+
     m_ButtonPanel = std::make_shared<ButtonPanel>(vec3(1.0f, 1.0f, 1.0f), vec2(100.0f, 10.0f), vec2(200.0f, 300.0f));
     m_ButtonPanel->setButtonSize({ 180.0f, 20.0f });
 
@@ -90,14 +109,8 @@ void MainMenu::onUpdate(float deltaTime)
     {
         m_SelectionMenu = !m_SelectionMenu;
 
-        GUIManager.Get<Button>("Load")->Enable(false);
-        GUIManager.Get<Button>("Delete")->Enable(false);
-
-        GUIManager.Get<Button>("Graf")->Enable(!m_SelectionMenu);
-        GUIManager.Get<Button>("Teorie")->Enable(!m_SelectionMenu);
-
+        ChangeTab();
         m_TabState = true;
-        m_Index = 0;
     }
     else if (tabstate == false) m_TabState = false;
 
@@ -162,7 +175,6 @@ void MainMenu::onUpdate(float deltaTime)
         m_Mascota->Render(m_MascotaPosition, m_SpritePixelSize);
 
         Renderer::drawLine({ 0.0f, 16.0f }, { m_BufferDim.x, 16.0f }, 0x000000, 2.0f);
-
         Renderer::drawText("Popa Catalin", m_NumeleMeuPos, 2.0f, vec3(0.0f, 0.0f, 0.0f));
         Renderer::drawText("V 1.0", { 3.0f, 0.0f }, 2.0f, vec3(0.0f, 0.0f, 0.0f));
     }
@@ -198,6 +210,7 @@ void MainMenu::Refresh()
 
         GUIManager.Get<Button>("Load")->Enable(true);
         GUIManager.Get<Button>("Delete")->Enable(true);
+        GUIManager.Get<Button>("Back")->Enable(true);
 
     };
 
@@ -205,4 +218,19 @@ void MainMenu::Refresh()
     {
         m_ButtonPanel->addButton({ 0.7f, 0.7f, 0.7f }, gr.first, std::bind(buttoncallback, gr.first));
     }
+}
+
+void MainMenu::ChangeTab()
+{
+    m_ButtonPanel->Refesh();
+
+    GUIManager.Get<Button>("Load")->Enable(false);
+    GUIManager.Get<Button>("Delete")->Enable(false);
+    GUIManager.Get<Button>("Back")->Enable(m_SelectionMenu);
+
+    GUIManager.Get<Button>("Graf")->Enable(!m_SelectionMenu);
+    GUIManager.Get<Button>("Teorie")->Enable(!m_SelectionMenu);
+    GUIManager.Get<Button>("Tab")->Enable(!m_SelectionMenu);
+
+    m_Index = 0;
 }

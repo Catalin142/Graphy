@@ -18,6 +18,8 @@ public:
 	void addButton(const vec3& color, const std::string& text, const std::function<void()>& func);
 	void Clear();
 
+	void Refesh();
+
 private:
 	std::vector<std::shared_ptr<Button>> m_Buttons;
 
