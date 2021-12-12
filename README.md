@@ -6,7 +6,7 @@ Graphy is a tree editor made in C++ and Win32 API.
  - Left-click: add node
  - W: connect nodes
  - R: edit mode
- - Tab (in main menu): load tree menu
+ - Tab (in main menu): load tree
 
 # Language
 Romanian
