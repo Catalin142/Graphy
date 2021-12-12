@@ -20,7 +20,7 @@ public:
 	Texture() = default;
 	Texture(const std::string& filepath);
 
-	~Texture() = default;
+	~Texture();
 
 	const unsigned long& getPixelColor(float x, float y) const;
 

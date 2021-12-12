@@ -8,6 +8,12 @@ Texture::Texture(const std::string& filepath) : m_Filepath(filepath)
 	GR_ASSERT(!loadTexture(filepath), "Textura ", filepath, " nu poate fi gasita");
 }
 
+Texture::~Texture()
+{
+	if (m_Buffer)
+		delete[] m_Buffer;
+}
+
 bool Texture::loadTexture(const std::string& filepath)
 {
 	std::ifstream readFile(m_Filepath.c_str(), std::ios::in | std::ios::binary);
