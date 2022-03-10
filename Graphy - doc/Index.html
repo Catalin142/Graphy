@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+   <meta charset="UTF-8">
+   <link rel="stylesheet" type="text/css" href="Style.css"/>
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Graphy documentation</title>
+   <img src = "Resources/Images/Logo.png" class = "center-img" width = "650px" height = "250px"> 
+   <p style = "text-align: center; font-size: 120%; margin-left: 220px; margin-top: -10px; font-weight: bold;"> Aplicație realizată de Popa Cătălin</p>
+</head>
+
+<body>
+   
+<div class="main">
+   <button class="accordion">1. Ce este Graphy? </button>
+   <div class="panel">
+      <p>
+         Graphy este o aplicație care are scopul de a învața elevii de liceu teoria grafurilor și de a ghida programatorii începători în crearea unei aplicații, aceasta fiind open-source.
+      </p>
+   </div>
+
+   <button class="accordion">2. De ce am creat aplicația? </button>
+   <div class="panel">
+      <p>
+         Am creat această aplicație pentru a ușura învațarea și desenarea grafurilor, aceasta fiind capabilă să deseneze grafuri cu pana la 40 de noduri, să salveze și să încarce grafurile salvate.
+      </p>
+   </div>
+
+   <button class="accordion">3. Cum am creat aplicația? </button>
+   <div class="panel">
+      <p>
+         Aplicația este creată pe parcursul a 2 luni în limbajul de programare C++, fără ajutorul librăriilor externe.
+      </p>
+      <img src = "Resources/Images/C++ Logo.png" width="100px" height="110px" style="margin-left: 50px;">
+   </div>
+
+   <button class="accordion">4. Cui i se adresează aplicația?  </button>
+   <div class="panel">
+      <p>
+         Aplicația se adresează elevilor de liceu, pentru a ușura pregătirea pentru bacalaureat, prin metode interactive. Programatorii au la dispoziție modul prin care aplicația C++ 
+         de la 0, codul fiind foarte bine documentat și ușor de înțeles.
+      </p>
+   </div>
+
+   <button class="accordion">5. De ce Graphy si nu alta aplicație realizata cu același scop?   </button>
+   <div class="panel">
+      <p>
+         Graphy, singura aplicație de acest tip disponibilă în limba română, este cea mai buna opțiune pentru elevii din România, ea fiind foarte ușor de folosit și de instalat.
+      </p>
+   </div>
+
+   <button class="accordion">6. Cum pot obține aplicația?   </button>
+   <div class="panel">
+      <p>
+         Aplicația poate fi descarcată de <a href="Resources/Graphy.rar"> aici </a>. Pentru a o instala este suficientă extragerea fișierelor din fișierul .rar descărcat. 
+         Graphy are tot codul disponibil online pe GitHub: <a href="https://github.com/Catalin142/Graphy"> https://github.com/Catalin142/Graphy </a>. Instrucțiunile de compilare a codului se află în fișierul README.md.
+         Pentru a compila codul este nevoie de Visual Studio 2019 sau o versiune mai recentă.
+      </p>
+   </div>
+
+   <button class="accordion">7. Galerie   </button>
+   <div class="gallery">
+      <div class="row">
+         <div class="column">
+           <img src="Resources/Images/Photo1.png" alt="1" style="width:100%; border: 2px solid #000;">
+         </div>
+         <div class="column">
+           <img src="Resources/Images/Photo2.png" alt="2" style="width:100%; border: 2px solid #000;">
+         </div>
+         <div class="column">
+           <img src="Resources/Images/Photo3.png" alt="3" style="width:100%; border: 2px solid #000;">
+         </div>
+         <div class="column">
+           <img src="Resources/Images/Photo4.png" alt="4" style="width:100%; border: 2px solid #000;">
+          </div>
+       </div>
+   </div>
+</div>
+
+<script>
+ !function()
+ {
+    for(var t=document.getElementsByClassName("accordion"),e=0,i=t.length;e<i;e++)
+      t[e].onclick=function()
+      {
+         this.classList.toggle("active");
+         var t=this.nextElementSibling;
+         t.style.maxHeight?t.style.maxHeight="":t.style.maxHeight=t.scrollHeight+"px"
+      }
+}();
+</script>
+</body>
+</html>

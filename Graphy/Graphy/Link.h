@@ -9,7 +9,9 @@ public:
 	Link(const vec2& head1, const vec2& head2, int id1, int id2);
 	~Link() = default;
 
-	void getMiddle();
+	const vec2& getMiddle();
+	int getLeftID() const { return m_IDLeft; }
+	int getRightID() const { return m_IDRight; }
 
 private:
 	const vec2& m_Left; 

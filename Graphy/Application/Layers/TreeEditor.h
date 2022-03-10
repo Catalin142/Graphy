@@ -14,7 +14,7 @@ public:
 	void onUpdate(float deltaTime) override;
 	bool onEvent(Event& ev) override;
 
-	void setTree(const std::string& name) { m_Graph = TreeManager::Get()[name]; m_TreeName = name; }
+	void setTree(const std::string& name) { m_Graph = TreeManager::Get()[name]; m_Graph->recalculateLinks(); m_TreeName = name; }
 
 private:
 	std::shared_ptr<Tree> m_Graph;

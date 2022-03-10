@@ -71,11 +71,11 @@ void Renderer::drawQuad(const vec2& pos, const vec2& size, const vec3& color)
 
 void Renderer::plotQuad(const vec2& pos, const vec2& size, unsigned long color, float thickness)
 {
-	drawLine(pos, pos + vec2(size.x, 0), color, thickness);
-	drawLine(pos, pos + vec2(0, size.y), color, thickness);
+	drawLine(pos, pos + vec2(size.x - 1, 0), color, thickness);
+	drawLine(pos, pos + vec2(0, size.y - 1), color, thickness);
 
-	drawLine(pos + vec2(0, size.y), pos + vec2(size.x + 1, size.y), color, thickness);
-	drawLine(pos + vec2(size.x, 0), pos + vec2(size.x, size.y), color, thickness);
+	drawLine(pos + vec2(0, size.y - 1), pos + vec2(size.x, size.y), color, thickness);
+	drawLine(pos + vec2(size.x - 1, 0), pos + vec2(size.x, size.y), color, thickness);
 }
 
 void Renderer::plotQuad(const vec2& pos, const vec2& size, const vec3& color, float thickness)
@@ -149,6 +149,7 @@ void Renderer::drawLine(const vec2& begin, const vec2& end, unsigned long color,
 {
 	vec2 dt = end - begin;
 	double length = dt.magnitude();
+	length = Clamp(length, 0.0f, 1000.0f);
 	vec2 addFactor = dt.normalize() * thickness;
 
 	dt.x = begin.x;

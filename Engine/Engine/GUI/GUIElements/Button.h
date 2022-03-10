@@ -12,7 +12,7 @@ class Button : public GUIBaseElement
 public:
 	Button() = default;
 	Button(const std::shared_ptr<Texture>& tex, const vec2& position, const vec2& size);
-	Button(const vec3 color, const vec2& position, const vec2& size);
+	Button(const vec3& color, const vec2& position, const vec2& size);
 
 	~Button() = default;
 

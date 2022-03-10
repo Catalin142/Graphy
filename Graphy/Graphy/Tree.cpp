@@ -7,6 +7,10 @@
 #include "Graphics/Font.h"
 #include "Renderer/Renderer.h"
 
+#define MATHS_DEBUG 1
+
+std::shared_ptr<DijsktraAlgorihm> Tree::m_Dijsktra;
+
 Tree::Tree(GraphType type) : m_Type(type)
 {
 	m_BufferDim.x = Application::Get()->getBuffer()->getWidth();
@@ -21,6 +25,12 @@ Tree::Tree(GraphType type) : m_Type(type)
 	m_DeleteSign = TextureManager::loadTexture("Resources/Editor/Delete.spr");
 
 	m_Links.reserve((40 * (40 - 1)) / 2);
+	m_Dijsktra = std::make_shared<DijsktraAlgorihm>();
+}
+
+Tree::~Tree()
+{
+	m_Dijsktra->m_Initialize = false;
 }
 
 void Tree::addNode(int x, int y)
@@ -39,6 +49,12 @@ void Tree::addNode(int x, int y)
 
 void Tree::Render()
 {
+	if (m_Dijsktra->m_Initialize == false && m_Modes[Modes::Dijsktra])
+	{
+		refreshAlgorithms();
+		m_Dijsktra->m_Initialize = true;
+	}
+
 	for (int x = 0; x < m_Nodes.size(); x++)
 	{
 		for (int y = 0; y < m_Nodes.size(); y++)
@@ -48,25 +64,88 @@ void Tree::Render()
 			if (x > y && m_Type == GraphType::Unoriented)
 				go = false;
 
+			vec3 color = { 0.0f, 0.0f, 0.0f };
+			float thickness = 2.0f;
+
+			if (m_Modes[Modes::Dijsktra])
+			{
+				for (const auto& s : m_Dijsktra->m_Solution)
+					if (x == s.first && y == s.second)
+					{
+						color = { 1.0f, 0.0f, 0.0f };
+						thickness = 3.0f;
+					}
+			}
+
 			if (m_Matrix[x][y] == 1 && go)
 			{
-				auto node = getNode(x);
-				auto snode = getNode(y);
+				auto& node = getNode(x);
+				auto& snode = getNode(y);
 
 				float rot = std::atan2(snode->m_Position.y - node->m_Position.y, snode->m_Position.x - node->m_Position.x);
 				vec2 dir = vec2(cos(rot), sin(rot));
 				vec2 linePosBeg = node->m_Position + dir * node->m_Radius;
 				vec2 linePosEnd = snode->m_Position - dir * snode->m_Radius;
 
-				Renderer::drawLine(linePosBeg, linePosEnd, { 0.0f, 0.0f, 0.0f }, 2.0f);
+				Renderer::drawLine(linePosBeg, linePosEnd, color, thickness);
 
 				if (m_Type == GraphType::Oriented)
 				{
 					rot -= degToRad(30.0f);
-					Renderer::drawLine(linePosEnd, (linePosEnd - vec2(cos(rot), sin(rot)) * 10.0f), { 0.0f, 0.0f, 0.0f }, 2.0f);
+					Renderer::drawLine(linePosEnd, (linePosEnd - vec2(cos(rot), sin(rot)) * 10.0f), color, thickness);
 
 					rot += degToRad(60.0f);
-					Renderer::drawLine(linePosEnd, (linePosEnd - vec2(cos(rot), sin(rot)) * 10.0f), { 0.0f, 0.0f, 0.0f }, 2.0f);
+					Renderer::drawLine(linePosEnd, (linePosEnd - vec2(cos(rot), sin(rot)) * 10.0f), color, thickness);
+				}
+
+				if (m_Modes[Modes::Length])
+				{
+					auto link = std::find_if(m_Links.begin(), m_Links.end(), [&](Link& lnk) -> bool {
+						return (lnk.getLeftID() == x && lnk.getRightID() == y);
+						});
+					if (link != m_Links.end())
+					{
+						// Facem cu panta ca la mate???
+						/*
+							avem 2 puncte (node->position, snode->position)
+						*/
+						// aflam panta dreptei dintre cele 2 puncte : (y2 - y1) / (x2 - x1)
+						float md = (snode->m_Position.y - node->m_Position.y) / (snode->m_Position.x - node->m_Position.x);
+						/*
+							acum ca stim panta dreptei trebuie sa aflam panta dreptei perpendiculare pe ea.
+							mds * md = -1 =>
+						*/
+						float mds = -1 / md;
+
+						/*
+							stim panta si acum vrem sa aflat ecuatia dreptei. Dreapta trece prin mijlocul dreptei formate de cele 2 noduri, deci
+							y - y0 = mds(x - x0)
+							y = mds(x - x0) + y0;
+						*/
+
+						vec2 mij = link->getMiddle();
+						vec2 pos;
+						pos.x = mij.x + 10.0f;
+						pos.y = (mds * pos.x - mds * mij.x + mij.y);
+
+						pos.x = Clamp(pos.x, mij.x - 10.0f, mij.x + 10.0f);
+						pos.y = Clamp(pos.y, mij.y - 10.0f, mij.y + 10.0f);
+
+						Renderer::drawText(std::to_string(m_DistanceMatrix[x][y]), pos, 2, {0.0f, 0.0f, 0.0f});
+
+
+#if MATHS_DEBUG == 0
+						vec2 pos2;
+						pos2.x = mij.x - 13.0f;
+						pos2.y = (mds * pos2.x - mds * mij.x + mij.y);
+
+						//pos2.x = Clamp(pos2.x, 0.0f, m_BufferDim.x);
+						//pos2.y = Clamp(pos2.y, 0.0f, m_BufferDim.y - 55.0f);
+
+						Renderer::drawLine(pos, pos2, 0x000000);
+
+#endif
+					}
 				}
 			}
 		}
@@ -86,14 +165,14 @@ NodeEvent Tree::onEvent(Event& ev)
 {
 	if (ev.getType() == EventType::MousePressed)
 	{
-		auto mp = static_cast<MousePressedEvent&>(ev);
+		auto& mp = static_cast<MousePressedEvent&>(ev);
 		vec2 mousePos = Input::WindowToBufferCoordonates(vec2(mp.getX(), mp.getY()));
 
 		if (mp.getMouseCode() == VK_MOUSE_LEFT)
 		{
 			for (auto& it = m_Nodes.rbegin(); it != m_Nodes.rend(); it++)
 			{
-				auto node = *it;
+				auto& node = *it;
 				if (node->isPressed(mousePos.x, mousePos.y))
 				{
 					if (!m_Select)
@@ -155,7 +234,7 @@ NodeEvent Tree::onEvent(Event& ev)
 
 	else if (ev.getType() == EventType::MouseMoved)
 	{
-		auto mp = static_cast<MouseMovedEvent&>(ev);
+		auto& mp = static_cast<MouseMovedEvent&>(ev);
 		auto pos = Input::WindowToBufferCoordonates(vec2(mp.getX(), mp.getY()));
 
 		NodeEvent returnType = NodeEvent::None;
@@ -174,6 +253,20 @@ NodeEvent Tree::onEvent(Event& ev)
 				std::for_each(m_Links.begin(), m_Links.end(), [&](auto& link) {
 					link.getMiddle();
 					});
+
+				for (int x = 0; x < m_Nodes.size(); x++)
+					for (int y = 0; y < m_Nodes.size(); y++)
+					{
+						if (m_Matrix[x][y] == 1)
+						{
+							auto& node1 = getNode(x);
+							auto& node2 = getNode(y);
+
+							m_DistanceMatrix[x][y] = (distance(node1->m_Position, node2->m_Position) / 20);
+						}
+					}
+
+				refreshAlgorithms();
 
 				returnType = NodeEvent::Moved;
 			}
@@ -279,8 +372,18 @@ void Tree::deleteNode()
 	m_SelectedNode = nullptr;
 }
 
+void Tree::refreshAlgorithms()
+{
+	if (m_Modes[Modes::Dijsktra])
+	{
+		m_Dijsktra->Generate(this, 0);
+		m_Dijsktra->getSolution(1);
+	}
+}
+
 void Tree::recalculateGrades()
 {
+	refreshAlgorithms();
 	if (m_Nodes.size() > 0)
 	{
 		for (auto& node : m_Nodes)
@@ -304,7 +407,9 @@ void Tree::recalculateGrades()
 
 void Tree::recalculateLinks()
 {
+	refreshAlgorithms();
 	m_Links.clear();
+
 	for(int x = 0; x < m_Nodes.size(); x++)
 		for (int y = 0; y < m_Nodes.size(); y++)
 		{
@@ -314,6 +419,88 @@ void Tree::recalculateLinks()
 				auto& node2 = getNode(y);
 
 				m_Links.emplace_back(node1->m_Position, node2->m_Position, x, y);
+				m_DistanceMatrix[x][y] = (distance(node1->m_Position, node2->m_Position) / 20);
 			}
 		}
+}
+
+void DijsktraAlgorihm::Generate(Tree* tree, int src)
+{
+	m_Size = tree->m_Nodes.size();
+	std::fill(m_Distances.begin(), m_Distances.begin() + m_Size + 1, INT_MAX);
+	std::fill(m_Visited.begin(), m_Visited.begin() + m_Size + 1, false);
+	std::fill(m_Parents.begin(), m_Parents.begin() + m_Size + 1, 0);
+	
+	m_Solution.clear();
+
+	m_Tree = tree;
+	m_Distances[src] = 0;
+	m_Source = src;
+
+	auto time = std::chrono::steady_clock::now();
+
+	for (int i = 0; i < m_Size - 1; i++)
+	{
+		int closest_node = getMinDistance();
+		m_Visited[closest_node] = true;
+
+		for (int j = 0; j < m_Size; j++)
+		{
+			if (!m_Visited[j] && m_Tree->m_Matrix[closest_node][j] && m_Distances[closest_node] != INT_MAX &&
+				m_Distances[closest_node] + m_Tree->m_DistanceMatrix[closest_node][j] < m_Distances[j])
+			{
+				m_Distances[j] = m_Distances[closest_node] + m_Tree->m_DistanceMatrix[closest_node][j];
+				m_Parents[j] = closest_node;
+			}
+		}
+	}
+
+	auto end = std::chrono::steady_clock::now();
+	auto elapsed = std::chrono::time_point_cast<std::chrono::microseconds>(end).time_since_epoch() -
+		std::chrono::time_point_cast<std::chrono::microseconds>(time).time_since_epoch();
+
+	m_Timer = elapsed.count();
+}
+
+void DijsktraAlgorihm::getSolution(int dest)
+{
+	if (m_Tree->m_Type == GraphType::Oriented)
+		m_Solution.push_back(std::make_pair(m_Parents[dest], dest));
+	else
+	{
+		if (m_Parents[dest] < dest)
+			m_Solution.push_back(std::make_pair(m_Parents[dest], dest));
+		else 
+			m_Solution.push_back(std::make_pair(dest, m_Parents[dest]));
+	}
+
+	while (m_Parents[dest])
+	{
+		dest = m_Parents[dest];
+
+		if (m_Tree->m_Type == GraphType::Oriented)
+			m_Solution.push_back(std::make_pair(m_Parents[dest], dest));
+		else
+		{
+			if (m_Parents[dest] < dest)
+				m_Solution.push_back(std::make_pair(m_Parents[dest], dest));
+			else
+				m_Solution.push_back(std::make_pair(dest, m_Parents[dest]));
+		}
+	}
+}
+
+int DijsktraAlgorihm::getMinDistance()
+{
+	int min = INT_MAX;
+	int index = 0;
+
+	for (int i = 0; i < m_Size; i++)
+		if (m_Distances[i] <= min && !m_Visited[i])
+		{
+			min = m_Distances[i];
+			index = i;
+		}
+
+	return index;
 }

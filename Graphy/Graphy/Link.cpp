@@ -6,7 +6,7 @@ Link::Link(const vec2& head1, const vec2& head2, int id1, int id2) : m_Left(head
 	getMiddle();
 }
 
-void Link::getMiddle()
+const vec2& Link::getMiddle()
 {
 	float distX = std::abs(m_Left.x - m_Right.x);
 
@@ -25,4 +25,5 @@ void Link::getMiddle()
 		m_Middle.y = m_Left.y + distY / 2.0f;
 
 	m_Middle = m_Middle - vec2(m_BoxSize / 2.0f, m_BoxSize / 2.0f);
+	return m_Middle;
 }

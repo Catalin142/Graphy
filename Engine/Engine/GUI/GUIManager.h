@@ -4,6 +4,7 @@
 #include "GUIElements/Button.h"
 #include "GUIElements/InputBox.h"
 #include "GUIElements/TextBox.h"
+#include "GUIElements/CheckBox.h"
 
 #include "Event/Event.h"
 

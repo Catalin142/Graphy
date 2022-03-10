@@ -44,7 +44,7 @@ bool GUIM::onEvent(Event& ev)
 {
 	if (ev.getType() == EventType::MousePressed)
 	{
-		auto mp = static_cast<MousePressedEvent&>(ev);
+		auto& mp = static_cast<MousePressedEvent&>(ev);
 		vec2 mousePos = Input::WindowToBufferCoordonates(vec2(mp.getX(), mp.getY()));
 
 		for (const auto& elem : m_GUIElements)
@@ -56,7 +56,7 @@ bool GUIM::onEvent(Event& ev)
 
 	else if (ev.getType() == EventType::MouseMoved)
 	{
-		auto mp = static_cast<MouseMovedEvent&>(ev);
+		auto& mp = static_cast<MouseMovedEvent&>(ev);
 		vec2 mousePos = Input::WindowToBufferCoordonates(vec2(mp.getX(), mp.getY()));
 
 		for (const auto& elem : m_GUIElements)
@@ -68,7 +68,7 @@ bool GUIM::onEvent(Event& ev)
 
 	else if (ev.getType() == EventType::KeyPressed)
 	{
-		auto lp = static_cast<KeyPressedEvent&>(ev);
+		auto& lp = static_cast<KeyPressedEvent&>(ev);
 		for (const auto& elem : m_GUIElements)
 			if (elem.second->m_isActive && elem.second->onKeyDown(lp.getKeyCode()))
 				return true;

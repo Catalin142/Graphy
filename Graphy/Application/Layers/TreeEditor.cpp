@@ -38,6 +38,7 @@ void TreeEditor::onAttach()
 			if (!m_TreeName.empty() && TreeManager::Get().find(m_TreeName) == TreeManager::Get().end())
 				m_Graph = std::make_shared<Tree>(GraphType::Unoriented);
 			});
+
 	}
 }
 
@@ -142,6 +143,11 @@ void TreeEditor::onUpdate(float deltaTime)
 		Renderer::drawLine({ m_Graph->m_MatrixPosition.x + 7 * 7.0f + 2, m_BufferDim.y - m_LineOffset }, { m_Graph->m_MatrixPosition.x + 7 * 7.0f + 2, m_BufferDim.y }, 0x000000);
 		Renderer::drawLine({ m_Graph->m_MatrixPosition.x + 395.0f, m_BufferDim.y - m_LineOffset }, { m_Graph->m_MatrixPosition.x + 395.0f, m_BufferDim.y }, 0x000000);
 
+		Renderer::drawLine({ m_BufferDim.x - 80.0f, m_BufferDim.y }, { m_BufferDim.x - 80.0f, m_BufferDim.y - m_LineOffset }, 0x0000000);
+
+		Renderer::drawText("Ponderi", { m_BufferDim.x - 55.0f, m_BufferDim.y - 10.0f }, 1, { 0.0f, 0.0f, 0.0f });
+		Renderer::drawText("Dijsktra", { m_BufferDim.x - 55.0f, m_BufferDim.y - 20.0f }, 1, { 0.0f, 0.0f, 0.0f });
+
 		if (m_Graph->m_SelectedNode)
 			drawNodeProps();
 		else
@@ -183,6 +189,8 @@ bool TreeEditor::onEvent(Event& ev)
 {
 	if (m_Graph)
 	{
+		GUIManager.Get<TextBox>("Tips")->Hide(m_Graph->m_Modes[Modes::Dijsktra]);
+
 		if (ev.getType() == EventType::MouseReleased)
 		{
 			auto mp = static_cast<MouseReleasedEvent&>(ev);
@@ -251,6 +259,11 @@ void TreeEditor::InitializeGUI()
 	GUIManager.Get<TextBox>("Tips")->setPosition({m_Graph->m_MatrixPosition.x + 7 * 7.0f + 4, m_BufferDim.y - m_LineOffset + 2});
 	GUIManager.Get<TextBox>("Tips")->setOffset(7, 0);
 	setTip();
+
+	vec2 checkPosFirst = { m_BufferDim.x - 70.0f, m_BufferDim.y - 10.0f };
+	GUIManager.Add("Length", new CheckBox(m_Graph->m_Modes[Modes::Length], checkPosFirst, { 7.0f, 7.0f }, { 0.0f, 0.0f, 0.0f }));
+	checkPosFirst.y -= 10.0f;
+	GUIManager.Add("Dijsktra", new CheckBox(m_Graph->m_Modes[Modes::Dijsktra], checkPosFirst, { 7.0f, 7.0f }, { 0.0f, 0.0f, 0.0f }));
 
 	m_Graph->m_SelectedNode = nullptr;
 }

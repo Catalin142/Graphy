@@ -6,7 +6,7 @@ Button::Button(const std::shared_ptr<Texture>& tex, const vec2& position, const 
 m_PixelDimensions(m_Size.x / tex->getWidth(), m_Size.y / tex->getHeight()), m_HoverPosition(m_Position + 5.0f), m_NormalPosition(position)
 { }
 
-Button::Button(const vec3 color, const vec2& position, const vec2& size) : m_Color(color), m_Position(position), m_Size(size),
+Button::Button(const vec3& color, const vec2& position, const vec2& size) : m_Color(color), m_Position(position), m_Size(size),
 m_PixelDimensions(m_Size), m_HoverPosition(m_Position + 5.0f), m_NormalPosition(position)
 { }
 
