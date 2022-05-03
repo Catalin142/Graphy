@@ -6,6 +6,7 @@
 class ButtonPanel
 {
 public:
+	ButtonPanel() = default;
 	ButtonPanel(const vec3& color, const vec2& position, const vec2& size);
 	~ButtonPanel() = default;
 
@@ -14,11 +15,15 @@ public:
 	bool onEvent(Event& ev);
 
 	void setButtonSize(const vec2& size);
+	void setSize(const vec2& size) { m_Size = size; refreshPosition(); }
+	void setPosition(const vec2& pos) { m_Position = pos; refreshPosition(); }
+	void setColor(const vec3& color) { m_Color = color; }
 
 	void addButton(const vec3& color, const std::string& text, const std::function<void()>& func);
 	void Clear();
 
-	void Refesh();
+	void Refresh();
+	void refreshPosition();
 
 private:
 	std::vector<std::shared_ptr<Button>> m_Buttons;

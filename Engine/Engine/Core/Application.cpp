@@ -77,3 +77,8 @@ void Application::Run()
 		oldTime = timeNow;
 	}
 }
+
+void Application::Close()
+{
+	m_Window->Close();
+}

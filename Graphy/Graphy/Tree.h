@@ -3,6 +3,7 @@
 #include "Event/Event.h"
 #include "GUI/GUIElements/TextBox.h"
 #include "GUI/GUIElements/InputBox.h"
+#include "GUI/GUIElements/ButtonPanel.h"
 #include "Graphics/Texture.h"
 #include "Link.h"
 
@@ -50,18 +51,18 @@ public:
 
 	void addNode(int x, int y);
 	void Render();
+	bool isLink(int x, int y);
 
 	NodeEvent onEvent(Event& ev);
 
 private:
-	std::vector<std::shared_ptr<Node>>  m_Nodes;
+	std::vector<std::shared_ptr<Node>> m_Nodes;
 	std::shared_ptr<Node> m_SelectedNode = nullptr;
 
 	int m_Matrix[MAX_NODES][MAX_NODES]{ 0 };
 	int m_DistanceMatrix[MAX_NODES][MAX_NODES]{ 0 };
 
 	int m_LastNumber = 1;
-	vec2 m_MatrixPosition;
 
 	bool m_Select = false;
 
@@ -77,6 +78,9 @@ private:
 
 	// Algorithms
 	static std::shared_ptr<DijsktraAlgorihm> m_Dijsktra;
+	int m_SourceNode = -1;
+	int m_DestinationNode = -1;
+
 
 private:
 	std::shared_ptr<Node>& getNode(int id);
@@ -86,6 +90,7 @@ private:
 
 	void deleteNode();
 	void refreshAlgorithms();
+	int getNodeID(const std::string& name);
 };
 
 class DijsktraAlgorihm
@@ -103,11 +108,11 @@ public:
 	void Generate(Tree* tree, int src);
 
 	void getSolution(int dest);
-	int getTime() { return m_Timer; }
 
 private:
 	Tree* m_Tree;
 	int m_Size;
+	bool m_Initialize = false;
 
 	int m_Source;
 	int m_Destination;
@@ -118,8 +123,6 @@ private:
 
 	std::vector<std::pair<int, int>> m_Solution;
 
-	int m_Timer = 0;
-	bool m_Initialize = false;
 
 private:
 	int getMinDistance();

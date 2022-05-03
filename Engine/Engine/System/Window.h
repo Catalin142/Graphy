@@ -26,6 +26,7 @@ public:
 	std::wstring getName() { return std::wstring(m_Name); }
 
 	static Window* Get() { return m_Instance; }
+	void Close();
 
 private:
 	HWND m_WindowHandle;

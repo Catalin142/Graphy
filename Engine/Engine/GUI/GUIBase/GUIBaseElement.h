@@ -27,6 +27,7 @@ public:
 	virtual void setText(const std::string& text, TextAnchorFlags flags) { }
 
 	void Hide(bool l) { m_IsHidden = l; }
+	bool isHidden() const { return m_IsHidden; }
 	void Enable(bool l) { m_isActive = l; m_IsHidden = !l; }
 
 private:

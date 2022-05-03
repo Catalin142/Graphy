@@ -18,6 +18,7 @@ public:
 
 private:
 	std::shared_ptr<Tree> m_Graph;
+	vec2 m_MatrixPosition;
 
 	int m_LineOffset = 55.0f;
 
@@ -32,6 +33,7 @@ private:
 	std::string m_NodeName = "";
 
 	bool m_GUIInitialized = false;
+	bool m_TreeExists = false;
 	
 private:
 	void InitializeGUI();

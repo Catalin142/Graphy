@@ -149,3 +149,8 @@ vec2 Window::getClientRectSize()
 	GetClientRect(Window::Get()->getHandle(), &rct);
 	return { (float)rct.right, (float)rct.bottom };
 }
+
+void Window::Close()
+{
+	PostMessage(m_WindowHandle, WM_QUIT, 0, 0);
+}

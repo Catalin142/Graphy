@@ -27,6 +27,7 @@ public:
 	void setLayer(Layer* layer);
 
 	void Run();
+	void Close();
 
 	std::shared_ptr<Window>& getWindow() { return m_Window; }
 	std::shared_ptr<GraphicsContext>& getBuffer() { return m_Buffer; }

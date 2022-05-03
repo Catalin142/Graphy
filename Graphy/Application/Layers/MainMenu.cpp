@@ -36,6 +36,12 @@ void MainMenu::onAttach()
         Application::Get()->setLayer(new TreeEditor);
         });
 
+    GUIManager.Add("Exit", new Button(m_ButtonFrame, vec2(470.0f, 30.0f), vec2(80.0f, 20.0f)));
+    GUIManager.Get<Button>("Exit")->setText("Iesi", Center);
+    GUIManager.Get<Button>("Exit")->setCallback([]() -> void {
+        Application::Get()->Close();
+        });
+
     GUIManager.Add("Tab", new Button(m_ButtonFrame, vec2(85.0f, 80.0f), vec2(200.0f, 30.0f)));
     GUIManager.Get<Button>("Tab")->setText("Deschide graf", Center);
     GUIManager.Get<Button>("Tab")->setCallback([&]() -> void {
@@ -58,7 +64,7 @@ void MainMenu::onAttach()
         {
             TreeManager::deleteTree(m_SelectedItem);
             m_ButtonPanel->Clear();
-            m_ButtonPanel->Refesh();
+            m_ButtonPanel->Refresh();
             Refresh();
 
             m_SelectedItem.clear();
@@ -176,7 +182,7 @@ void MainMenu::onUpdate(float deltaTime)
 
         Renderer::drawLine({ 0.0f, 16.0f }, { m_BufferDim.x, 16.0f }, 0x000000, 2.0f);
         Renderer::drawText("Popa Catalin", m_NumeleMeuPos, 2.0f, vec3(0.0f, 0.0f, 0.0f));
-        Renderer::drawText("V 1.0", { 3.0f, 0.0f }, 2.0f, vec3(0.0f, 0.0f, 0.0f));
+        Renderer::drawText("V 1.2", { 3.0f, 0.0f }, 2.0f, vec3(0.0f, 0.0f, 0.0f));
     }
     GUIManager.Render();
 }
@@ -222,7 +228,7 @@ void MainMenu::Refresh()
 
 void MainMenu::ChangeTab()
 {
-    m_ButtonPanel->Refesh();
+    m_ButtonPanel->Refresh();
 
     GUIManager.Get<Button>("Load")->Enable(false);
     GUIManager.Get<Button>("Delete")->Enable(false);
@@ -231,6 +237,7 @@ void MainMenu::ChangeTab()
     GUIManager.Get<Button>("Graf")->Enable(!m_SelectionMenu);
     GUIManager.Get<Button>("Teorie")->Enable(!m_SelectionMenu);
     GUIManager.Get<Button>("Tab")->Enable(!m_SelectionMenu);
+    GUIManager.Get<Button>("Exit")->Enable(!m_SelectionMenu);
 
     m_Index = 0;
 }

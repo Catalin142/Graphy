@@ -7,7 +7,7 @@
 #include "Graphics/Font.h"
 #include "Renderer/Renderer.h"
 
-#define MATHS_DEBUG 1
+#define MATHS_DEBUG 0
 
 std::shared_ptr<DijsktraAlgorihm> Tree::m_Dijsktra;
 
@@ -15,8 +15,6 @@ Tree::Tree(GraphType type) : m_Type(type)
 {
 	m_BufferDim.x = Application::Get()->getBuffer()->getWidth();
 	m_BufferDim.y = Application::Get()->getBuffer()->getHeight();
-	m_MatrixPosition.x = 5.0f;
-	m_MatrixPosition.y = m_BufferDim.y - Font::getGlyphHeight() - 3.0f;
 
 	//m_InputBox = std::make_shared<InputBox>(vec3(0.6f, 0.6f, 0.6f), 18, 7);
 	//m_InputBox->setCharacterLimit(3);
@@ -59,18 +57,21 @@ void Tree::Render()
 	{
 		for (int y = 0; y < m_Nodes.size(); y++)
 		{
-			// Sa deseneze 2 linii doar daca e orientat daca nu doar o linie
-			bool go = true;
+			bool go = false;
 			if (x > y && m_Type == GraphType::Unoriented)
-				go = false;
+				go = true;
+			else if (m_Type == GraphType::Oriented)
+				go = true;
 
 			vec3 color = { 0.0f, 0.0f, 0.0f };
 			float thickness = 2.0f;
 
 			if (m_Modes[Modes::Dijsktra])
 			{
+				if (m_SourceNode == -1 || m_DestinationNode == -1)
+					m_Dijsktra->m_Solution.clear();
 				for (const auto& s : m_Dijsktra->m_Solution)
-					if (x == s.first && y == s.second)
+					if ((x == s.first && y == s.second) || (x == s.second && y == s.first))
 					{
 						color = { 1.0f, 0.0f, 0.0f };
 						thickness = 3.0f;
@@ -115,6 +116,8 @@ void Tree::Render()
 							acum ca stim panta dreptei trebuie sa aflam panta dreptei perpendiculare pe ea.
 							mds * md = -1 =>
 						*/
+						if (md == 0)
+							md = -1;
 						float mds = -1 / md;
 
 						/*
@@ -161,6 +164,16 @@ void Tree::Render()
 		node->Render();
 }
 
+bool Tree::isLink(int x, int y)
+{
+	for (const auto& lnk : m_Links)
+	{
+		if ((lnk.m_IDLeft == x && lnk.m_IDRight == y) || (lnk.m_IDLeft == y && lnk.m_IDRight == x))
+			return true;
+	}
+	return false;
+}
+
 NodeEvent Tree::onEvent(Event& ev)
 {
 	if (ev.getType() == EventType::MousePressed)
@@ -175,6 +188,16 @@ NodeEvent Tree::onEvent(Event& ev)
 				auto& node = *it;
 				if (node->isPressed(mousePos.x, mousePos.y))
 				{
+					if (m_Modes[Modes::Dijsktra])
+					{
+						if (m_SourceNode == -1)
+							m_SourceNode = node->m_ID;
+						else if (m_DestinationNode == -1)
+						{
+							m_DestinationNode = node->m_ID;
+						}
+					}
+
 					if (!m_Select)
 					{
 						node->m_isMoved = true;
@@ -327,6 +350,8 @@ std::shared_ptr<Node>& Tree::getNode(int id)
 {
 	auto it = std::find_if(m_Nodes.begin(), m_Nodes.end(), [&](const auto& node) -> bool {
 		return node->m_ID == id; });
+	if (it == m_Nodes.end())
+		return std::shared_ptr<Node>();
 	return *it;
 }
 
@@ -376,14 +401,39 @@ void Tree::refreshAlgorithms()
 {
 	if (m_Modes[Modes::Dijsktra])
 	{
-		m_Dijsktra->Generate(this, 0);
-		m_Dijsktra->getSolution(1);
+		if (m_SourceNode != -1 && m_DestinationNode != -1 && m_SourceNode != m_DestinationNode)
+		{
+			auto& src = getNode(m_SourceNode);
+			auto& dest = getNode(m_DestinationNode);
+
+			if (src != nullptr && dest != nullptr)
+			{
+				m_Dijsktra->Generate(this, getNode(m_SourceNode)->m_ID);
+				m_Dijsktra->getSolution(getNode(m_DestinationNode)->m_ID);
+			}
+			else
+			{
+				m_SourceNode = -1;
+				m_DestinationNode = -1;
+			}
+		}
+		else
+		{
+			m_Dijsktra->m_Solution.clear();
+		}
 	}
+}
+
+int Tree::getNodeID(const std::string& name)
+{
+	auto& node = std::find_if(m_Nodes.begin(), m_Nodes.end(), [&](auto& node) -> bool { return node->m_Name == name; });
+	if (node != m_Nodes.end())
+		return node->get()->m_ID;
+	return 0;
 }
 
 void Tree::recalculateGrades()
 {
-	refreshAlgorithms();
 	if (m_Nodes.size() > 0)
 	{
 		for (auto& node : m_Nodes)
@@ -403,11 +453,11 @@ void Tree::recalculateGrades()
 			node->m_InternalDegree = inter;
 		}
 	}
+	refreshAlgorithms();
 }
 
 void Tree::recalculateLinks()
 {
-	refreshAlgorithms();
 	m_Links.clear();
 
 	for(int x = 0; x < m_Nodes.size(); x++)
@@ -422,6 +472,8 @@ void Tree::recalculateLinks()
 				m_DistanceMatrix[x][y] = (distance(node1->m_Position, node2->m_Position) / 20);
 			}
 		}
+
+	refreshAlgorithms();
 }
 
 void DijsktraAlgorihm::Generate(Tree* tree, int src)
@@ -436,8 +488,6 @@ void DijsktraAlgorihm::Generate(Tree* tree, int src)
 	m_Tree = tree;
 	m_Distances[src] = 0;
 	m_Source = src;
-
-	auto time = std::chrono::steady_clock::now();
 
 	for (int i = 0; i < m_Size - 1; i++)
 	{
@@ -454,40 +504,32 @@ void DijsktraAlgorihm::Generate(Tree* tree, int src)
 			}
 		}
 	}
-
-	auto end = std::chrono::steady_clock::now();
-	auto elapsed = std::chrono::time_point_cast<std::chrono::microseconds>(end).time_since_epoch() -
-		std::chrono::time_point_cast<std::chrono::microseconds>(time).time_since_epoch();
-
-	m_Timer = elapsed.count();
 }
 
 void DijsktraAlgorihm::getSolution(int dest)
 {
-	if (m_Tree->m_Type == GraphType::Oriented)
-		m_Solution.push_back(std::make_pair(m_Parents[dest], dest));
-	else
+	if (m_Distances[dest] == INT_MAX)
+		return;
+	do
 	{
-		if (m_Parents[dest] < dest)
-			m_Solution.push_back(std::make_pair(m_Parents[dest], dest));
-		else 
-			m_Solution.push_back(std::make_pair(dest, m_Parents[dest]));
-	}
-
-	while (m_Parents[dest])
-	{
-		dest = m_Parents[dest];
-
 		if (m_Tree->m_Type == GraphType::Oriented)
 			m_Solution.push_back(std::make_pair(m_Parents[dest], dest));
 		else
 		{
-			if (m_Parents[dest] < dest)
-				m_Solution.push_back(std::make_pair(m_Parents[dest], dest));
-			else
+			if (m_Tree->isLink(dest, m_Parents[dest]))
 				m_Solution.push_back(std::make_pair(dest, m_Parents[dest]));
+			else if (m_Tree->isLink(m_Parents[dest], dest))
+				m_Solution.push_back(std::make_pair(m_Parents[dest], dest));
 		}
-	}
+		if (m_Solution.size() > m_Tree->m_Nodes.size())
+		{
+			m_Solution.clear();
+			break;
+		}
+
+		dest = m_Parents[dest];
+
+	} while (dest != m_Source);
 }
 
 int DijsktraAlgorihm::getMinDistance()

@@ -109,8 +109,7 @@ bool ButtonPanel::onEvent(Event& ev)
 void ButtonPanel::setButtonSize(const vec2& size)
 {
 	m_ButtonSize = size; 
-	m_MaxButtonsOnPage = (m_Size.y - 10.0f) / (m_ButtonSize.y + 3.0f);
-	m_ButtonPosition = { m_Position.x + m_Size.x / 2.0f - m_ButtonSize.x / 2.0f, m_Position.y + m_Size.y - m_ButtonSize.y - 10.0f };
+	refreshPosition();
 }
 
 void ButtonPanel::addButton(const vec3& color, const std::string& text, const std::function<void()>& func)
@@ -130,8 +129,14 @@ void ButtonPanel::Clear()
 	m_ButtonPosition = { m_Position.x + m_Size.x / 2.0f - m_ButtonSize.x / 2.0f, m_Position.y + m_Size.y - m_ButtonSize.y - 10.0f };
 }
 
-void ButtonPanel::Refesh()
+void ButtonPanel::Refresh()
 {
 	m_SelectedIndex = -1;
 	m_ActiveItem = -1;
+}
+
+void ButtonPanel::refreshPosition()
+{
+	m_MaxButtonsOnPage = (m_Size.y - 10.0f) / (m_ButtonSize.y + 3.0f);
+	m_ButtonPosition = { m_Position.x + m_Size.x / 2.0f - m_ButtonSize.x / 2.0f, m_Position.y + m_Size.y - m_ButtonSize.y - 10.0f };
 }
