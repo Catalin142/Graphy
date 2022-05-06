@@ -1,5 +1,6 @@
 workspace "Graphy"
 	architecture "x86"
+	startproject "Graphy"
 	configurations { "Debug", "Release" }
 	flags
 	{
