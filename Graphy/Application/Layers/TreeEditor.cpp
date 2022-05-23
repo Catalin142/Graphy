@@ -46,7 +46,7 @@ void TreeEditor::onAttach()
 			{
 				if (TreeManager::Get().find(m_TreeName) != TreeManager::Get().end())
 					m_TreeExists = true;
-				else m_Graph = std::make_shared<Tree>(GraphType::Unoriented);
+				else m_Graph = std::make_shared<Tree>(GraphType::Undirected);
 			}
 			});
 

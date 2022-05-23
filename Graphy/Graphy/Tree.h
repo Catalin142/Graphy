@@ -15,7 +15,7 @@ enum class GraphType
 {
 	None,
 	Oriented,
-	Unoriented,
+	Undirected,
 };
 
 enum class NodeEvent

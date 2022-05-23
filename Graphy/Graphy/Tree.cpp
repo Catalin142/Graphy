@@ -46,7 +46,7 @@ void Tree::Render()
 		for (int y = 0; y < m_Nodes.size(); y++)
 		{
 			bool go = false;
-			if (x > y && m_Type == GraphType::Unoriented)
+			if (x > y && m_Type == GraphType::Undirected)
 				go = true;
 			else if (m_Type == GraphType::Oriented)
 				go = true;
@@ -197,7 +197,7 @@ NodeEvent Tree::onEvent(Event& ev)
 						{
 							m_Matrix[m_SelectedNode->m_ID][node->m_ID] = 1;
 
-							if (m_Type == GraphType::Unoriented)
+							if (m_Type == GraphType::Undirected)
 								m_Matrix[node->m_ID][m_SelectedNode->m_ID] = 1;
 
 							m_SelectedNode = node;
@@ -228,7 +228,7 @@ NodeEvent Tree::onEvent(Event& ev)
 					mousePos.y > boxPos.y && mousePos.y < boxPos.y + size)
 				{
 					m_Matrix[m_Links[m_DrawLink].m_IDLeft][m_Links[m_DrawLink].m_IDRight] = 0;
-					if (m_Type == GraphType::Unoriented)
+					if (m_Type == GraphType::Undirected)
 					{
 						m_Matrix[m_Links[m_DrawLink].m_IDRight][m_Links[m_DrawLink].m_IDLeft] = 0;
 					}

@@ -25,7 +25,7 @@ void TheoryTab::onAttach()
 	GUIManager.Get<Button>("Neo")->setHoverAnimationDist(3);
 	GUIManager.Get<Button>("Neo")->setText("Graf neorientat", Center);
 	GUIManager.Get<Button>("Neo")->setCallback([&]() -> void {
-		m_SelectedType = GraphType::Unoriented; Update();
+		m_SelectedType = GraphType::Undirected; Update();
 		});
 
 	GUIManager.Add("Return", new Button(m_ButtonFrame, vec2(5.0f, m_BufferDim.y - 25.0f), vec2(80.0f, 20.0f)));
@@ -109,7 +109,7 @@ void TheoryTab::loadTheory(const std::string& filepath)
 			if (!def.empty())
 				m_Theory[currentType].push_back(def);
 			def.clear();
-			currentType = GraphType::Unoriented;
+			currentType = GraphType::Undirected;
 		}
 		else
 		{
