@@ -24,7 +24,7 @@ Graphy comes with it's own engine written in C++ and with it's own sprite editor
 
 ## System requirements
 
-For now, Graphy was developed and tested only on Windows 10, so, to be sure you can run this app, you need Windows 10.
+Graphy was developed and tested only on Windows 10, so, to be sure you can run this app, you need Windows 10.
 
 ## Documentation
 
