@@ -1,6 +1,7 @@
 # Graphy
 
 Graph editor made in C++ and Win32 API.
+
 ![Graphy Layout](Graphy-doc/Screenshot.png)
 
 ## Overview
