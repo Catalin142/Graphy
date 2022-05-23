@@ -27,7 +27,7 @@ For now, Graphy was developed and tested only on Windows 10, so, to be sure you 
 
 ## Documentation
 
-Application's [documentation](Graphy-doc/Documentatie Aplicatie.pdf) is written in romanian.
+Application's [documentation](Graphy-doc/DocumentatieAplicatie.pdf) is written in romanian.
 
 ## Building
 
