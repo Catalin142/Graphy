@@ -32,11 +32,15 @@ public:
 	std::shared_ptr<Window>& getWindow() { return m_Window; }
 	std::shared_ptr<GraphicsContext>& getBuffer() { return m_Buffer; }
 
+	void callLast(const std::function<void()>& func) { m_LastToCall.push_back(func); }
+
 	static Application* Get() { return m_Instance; }
 
 protected:
 	std::shared_ptr<Window> m_Window;
 	std::shared_ptr<GraphicsContext> m_Buffer;
+
+	std::vector<std::function<void()>> m_LastToCall;
 
 	Layer* m_CurrentLayer = nullptr;
 

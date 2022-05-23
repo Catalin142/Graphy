@@ -15,12 +15,15 @@ public:
 
 	void Render() override;
 
+	void setBorderColor(const vec3& color) { m_BorderColor = createHex(color); }
+
 	void setPosition(const vec2& pos) { m_Position = pos; }
 	void setPosition(int flags);
 
 	void setSize(int width, int height) { m_Width = width; m_Height = height; Refresh(); }
 	void setTextSize(int x) override { m_TextLayout.m_TextSize = x; }
 	void setTextPosition(int flags) { m_TextLayout.m_Flags = flags; }
+	void setTextColor(const vec3& color) { m_TextLayout.m_Color = color; }
 
 	void setText(const std::string& text, int flags, const vec3& color, bool clear = true);
 	void setText(const std::string& text, bool clear = true);
@@ -29,6 +32,7 @@ public:
 
 private:
 	unsigned long m_Color;
+	long m_BorderColor = -1L;
 
 	float m_Width;
 	float m_Height;
@@ -42,7 +46,7 @@ private:
 		int m_Rows;
 		int m_TextWidth;
 		int m_Flags;
-		vec3 m_Color;
+		vec3 m_Color = {0.0f, 0.0f, 0.0f};
 		int m_TextSize = 1;
 
 	} m_TextLayout;

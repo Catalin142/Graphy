@@ -12,6 +12,9 @@ m_Height(height)
 void TextBox::Render()
 {
 	Renderer::drawQuad(m_Position, { (float)m_Width, (float)m_Height }, m_Color);
+	if (m_BorderColor != -1)
+		Renderer::plotQuad(m_Position, { (float)m_Width, (float)m_Height }, m_BorderColor);
+
 
 	if (m_Text.empty())
 	{

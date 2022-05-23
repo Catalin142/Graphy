@@ -36,8 +36,8 @@ void TheoryTab::onAttach()
 		Application::Get()->setLayer(new MainMenu);
 		});
 
-	GUIManager.Add("MainTextBox", new TextBox(vec3(225.0f / 255.0f, 227.0f / 255.0f, 221.0f / 255.0f), m_BufferDim.x, m_BufferDim.y - 35.0f));
-	GUIManager.Get<TextBox>("MainTextBox")->setPosition({ 0.0f, 0.0f });
+	GUIManager.Add("MainTextBox", new TextBox(vec3(225.0f / 255.0f, 227.0f / 255.0f, 221.0f / 255.0f), m_BufferDim.x, m_BufferDim.y - 85.0f));
+	GUIManager.Get<TextBox>("MainTextBox")->setPosition({ 0.0f, 50.0f });
 	GUIManager.Get<TextBox>("MainTextBox")->setOffset(10.0f, 15.0f);
 	GUIManager.Get<TextBox>("MainTextBox")->setTextSize(1);
 	GUIManager.Get<TextBox>("MainTextBox")->setTextPosition(Left | Top);
@@ -66,9 +66,6 @@ void TheoryTab::onAttach()
 void TheoryTab::onUpdate(float deltaTime)
 {
 	Renderer::Clear();
-
-	GUIManager.Render();
-
 	Renderer::drawLine({ 0.0f, m_BufferDim.y - 30.0f }, { m_BufferDim.x, m_BufferDim.y - 30.0f }, 0x000000);
 
 	std::string text = std::to_string(m_CurrentPage + 1) + "\\" + std::to_string(m_Pages);

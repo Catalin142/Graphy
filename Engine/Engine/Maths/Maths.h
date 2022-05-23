@@ -39,6 +39,7 @@ class vec3
 public:
 	vec3() = default;
 	vec3(float x_, float y_, float z_) : x(x_), y(y_), z(z_) { }
+	vec3(const vec2& other) : x(other.x), y(other.y), z(0.0f) { }
 
 	union { float x, r; };
 	union { float y, g; };

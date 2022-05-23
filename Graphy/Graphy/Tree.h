@@ -47,7 +47,7 @@ class Tree
 
 public:
 	Tree(GraphType type);
-	~Tree();
+	~Tree() = default;
 
 	void addNode(int x, int y);
 	void Render();
@@ -112,7 +112,6 @@ public:
 private:
 	Tree* m_Tree;
 	int m_Size;
-	bool m_Initialize = false;
 
 	int m_Source;
 	int m_Destination;

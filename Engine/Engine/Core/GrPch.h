@@ -19,6 +19,7 @@
 #include <vector>
 #include <iterator>
 #include <array>
+#include <queue>
 #include <list>
 #include <bitset>
 #include <unordered_map>

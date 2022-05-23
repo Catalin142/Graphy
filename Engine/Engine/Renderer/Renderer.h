@@ -60,5 +60,4 @@ private:
 	static void drawNumber_i(char n, vec2& pos, float size, unsigned int color);
 	static void drawSymbol_i(char s, vec2& pos, float size, unsigned int color); // Internal
 
-	// TODO: poate sa fac un stencil buffer dar meeeeeh mi e lene...
 };

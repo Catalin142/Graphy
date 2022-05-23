@@ -121,56 +121,7 @@ void MainMenu::onUpdate(float deltaTime)
     else if (tabstate == false) m_TabState = false;
 
     if (m_SelectionMenu)
-    {
-#if 0
-        float posY = 270.0f;
-        int i = 0;
-        for (const auto& tree : TreeManager::Get())
-        {
-            int textWidth = Font::getTextWidth(tree.first, 2);
-            vec2 Pos = { m_BufferDim.x / 2.0f - textWidth / 2.0f, posY };
-
-            vec3 Color = { 0.0f, 0.0f, 0.0f };
-            if (i == m_Index)
-                Color = { 1.0f, 0.0f, 0.0f };
-
-            Renderer::plotQuad({ m_BufferDim.x / 2.0f - 155.0f, posY - 3.0f }, { 310.0f, 20.0f }, Color);
-            Renderer::drawText(tree.first, Pos, 2, { 1.0f, 0.5f, 0.2f });
-            
-            posY -= 22.0f;
-            i++;
-        }
-
-        if (GetAsyncKeyState(VK_UP) & 0x0001)
-            m_Index--;
-        else if (GetAsyncKeyState(VK_DOWN) & 0x0001)
-            m_Index++;
-
-        if (m_Index > TreeManager::Get().size() - 1)
-            m_Index = 0;
-        else if (m_Index < 0)
-            m_Index = TreeManager::Get().size() - 1;
-
-        if (Input::isPressed(VK_RETURN))
-        {
-            auto editor = new TreeEditor();
-            std::string t = "";
-            int i = 0;
-            for (const auto& tree : TreeManager::Get())
-            {
-                if (i == m_Index)
-                { 
-                    t = tree.first;
-                    break;
-                }
-                i++;
-            }
-            editor->setTree(t);
-            Application::Get()->setLayer(editor);
-        }
-#endif
         m_ButtonPanel->Render();
-    }
 
     else
     {
@@ -182,9 +133,8 @@ void MainMenu::onUpdate(float deltaTime)
 
         Renderer::drawLine({ 0.0f, 16.0f }, { m_BufferDim.x, 16.0f }, 0x000000, 2.0f);
         Renderer::drawText("Popa Catalin", m_NumeleMeuPos, 2.0f, vec3(0.0f, 0.0f, 0.0f));
-        Renderer::drawText("V 1.2", { 3.0f, 0.0f }, 2.0f, vec3(0.0f, 0.0f, 0.0f));
+        Renderer::drawText("V 1.3", { 3.0f, 0.0f }, 2.0f, vec3(0.0f, 0.0f, 0.0f));
     }
-    GUIManager.Render();
 }
 
 bool MainMenu::onEvent(Event& ev)
@@ -230,8 +180,8 @@ void MainMenu::ChangeTab()
 {
     m_ButtonPanel->Refresh();
 
-    GUIManager.Get<Button>("Load")->Enable(false);
-    GUIManager.Get<Button>("Delete")->Enable(false);
+    GUIManager.Get<Button>("Load")->Enable(m_SelectionMenu);
+    GUIManager.Get<Button>("Delete")->Enable(m_SelectionMenu);
     GUIManager.Get<Button>("Back")->Enable(m_SelectionMenu);
 
     GUIManager.Get<Button>("Graf")->Enable(!m_SelectionMenu);

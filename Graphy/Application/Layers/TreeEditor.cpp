@@ -46,7 +46,7 @@ void TreeEditor::onAttach()
 			{
 				if (TreeManager::Get().find(m_TreeName) != TreeManager::Get().end())
 					m_TreeExists = true;
-				else m_Graph = std::make_shared<Tree>(GraphType::Oriented);
+				else m_Graph = std::make_shared<Tree>(GraphType::Unoriented);
 			}
 			});
 
@@ -65,8 +65,6 @@ void TreeEditor::onAttach()
 void TreeEditor::onUpdate(float deltaTime)
 {
 	Renderer::Clear();
-
-	GUIManager.Render();
 
 	if (m_Graph)
 	{
@@ -182,7 +180,7 @@ void TreeEditor::onUpdate(float deltaTime)
 			GUIManager.Get<InputBox>("Input")->Enable(false);
 
 		m_Graph->Render();
-		drawMatrix();
+		Application::Get()->callLast([&]() -> void {drawInfo(); });
 
 		bool rstate = Input::isPressed('R');
 		if (m_Graph->m_SelectedNode && (rstate != m_RState && rstate == true))
@@ -236,6 +234,7 @@ void TreeEditor::onUpdate(float deltaTime)
 				}
 			}
 		}
+		Renderer::drawText("TAB-informatii", { m_BufferDim.x - 72.0f, m_BufferDim.y - 50.0f }, 1.0f, { 0.0f, 0.0f, 0.0f });
 	}
 	else
 	{
@@ -243,7 +242,6 @@ void TreeEditor::onUpdate(float deltaTime)
 		{
 			Renderer::drawText("Graf deja existent", { m_BufferDim.x / 2.0f - Font::getTextWidth("Graf deja existent") / 2.0f, 220.0f }, 1, vec3(1.0f, 0.0f, 0.0f));
 		}
-
 	}
 }
 
@@ -339,6 +337,13 @@ void TreeEditor::InitializeGUI()
 		});
 	GUIManager.Get<Button>("Generate")->Enable(false);
 
+	GUIManager.Add("Instructions", new TextBox({ 1.0f, 1.0f, 1.0f }, 127.0f, 160.0f));
+	GUIManager.Get<TextBox>("Instructions")->setPosition({ 420.0f, 70.0f });
+	GUIManager.Get<TextBox>("Instructions")->setBorderColor({ 0.0f, 0.0f, 0.0f });
+	GUIManager.Get<TextBox>("Instructions")->setOffset(10, 10);
+	GUIManager.Get<TextBox>("Instructions")->setText("CTRL+S-salveaza graful\n\nSpace-creaza nod nou\n\nClick stanga-misca nodul\n\nW+mouse-traseza muchie\n\nW+click stanga-creaza muchie\n\nClick dreapta-sterge nodul sau muchia selectata\n\nR-modifica numele nodului selectat", 
+		Top | Left, {0.0f, 0.0f, 0.0f});
+	GUIManager.Get<TextBox>("Instructions")->Hide(true);
 }
 
 void TreeEditor::setTip()
@@ -347,21 +352,27 @@ void TreeEditor::setTip()
 	GUIManager.Get<TextBox>("Tips")->setText(std::to_string(m_CurrentTip + 1) + "\\" + std::to_string(TheoryTab::m_Theory[m_Graph->m_Type].size()), Bottom | Right, {0.0f, 0.0f, 0.0f}, false);
 }
 
-void TreeEditor::drawMatrix()
+void TreeEditor::drawInfo()
 {
 	int Limit;
 	if (Input::isPressed(VK_TAB))
 	{
 		Limit = m_Graph->m_Nodes.size();
 		Renderer::drawQuad({ m_MatrixPosition.x - 1.0f,  m_MatrixPosition.y - (Limit - 1) * 7.0f }, { Limit * 7.0f, Limit * 7.0f }, { 1.0f, 1.0f, 1.0f });
+		Renderer::plotQuad({ m_MatrixPosition.x - 1.0f,  m_MatrixPosition.y - (Limit - 1) * 7.0f - 1.0f }, { Limit * 7.0f + 1.0f, Limit * 7.0f + 2.0f}, { 0.0f, 0.0f, 0.0f });
+		GUIManager.Get<TextBox>("Instructions")->Hide(false);
 	}
-
-	else Limit = Clamp(m_Graph->m_Nodes.size(), 0, 7);
+	else
+	{
+		Limit = Clamp(m_Graph->m_Nodes.size(), 0, 7);
+		if (!GUIManager.Get<TextBox>("Instructions")->isHidden())
+			GUIManager.Get<TextBox>("Instructions")->Hide(true);
+	}
 
 	auto pos = m_MatrixPosition;
 	for (int x = 0; x < Limit; x++)
 	{
-		pos.x = m_MatrixPosition.x;
+		pos.x = m_MatrixPosition.x + 1.0f;
 		for (int y = 0; y < Limit; y++)
 		{
 			Renderer::drawNumber((char)m_Graph->m_Matrix[x][y] + '0', pos, 1, 0x000000);

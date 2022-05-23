@@ -40,5 +40,5 @@ private:
 	void setTip();
 
 	void drawNodeProps();
-	void drawMatrix();
+	void drawInfo();
 };

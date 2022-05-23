@@ -7,9 +7,9 @@
 #include "Graphics/Font.h"
 #include "Renderer/Renderer.h"
 
-#define MATHS_DEBUG 0
+#define MATHS_DEBUG 1
 
-std::shared_ptr<DijsktraAlgorihm> Tree::m_Dijsktra;
+std::shared_ptr<DijsktraAlgorihm> Tree::m_Dijsktra = std::make_shared<DijsktraAlgorihm>();
 
 Tree::Tree(GraphType type) : m_Type(type)
 {
@@ -23,12 +23,6 @@ Tree::Tree(GraphType type) : m_Type(type)
 	m_DeleteSign = TextureManager::loadTexture("Resources/Editor/Delete.spr");
 
 	m_Links.reserve((40 * (40 - 1)) / 2);
-	m_Dijsktra = std::make_shared<DijsktraAlgorihm>();
-}
-
-Tree::~Tree()
-{
-	m_Dijsktra->m_Initialize = false;
 }
 
 void Tree::addNode(int x, int y)
@@ -47,12 +41,6 @@ void Tree::addNode(int x, int y)
 
 void Tree::Render()
 {
-	if (m_Dijsktra->m_Initialize == false && m_Modes[Modes::Dijsktra])
-	{
-		refreshAlgorithms();
-		m_Dijsktra->m_Initialize = true;
-	}
-
 	for (int x = 0; x < m_Nodes.size(); x++)
 	{
 		for (int y = 0; y < m_Nodes.size(); y++)

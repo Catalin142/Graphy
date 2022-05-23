@@ -66,7 +66,13 @@ void Application::Run()
 
 		if (GetFocus() == m_Window->getHandle())
 			if (m_CurrentLayer->m_Active)
+			{
 				m_CurrentLayer->onUpdate(Time::deltaTime);
+				m_CurrentLayer->GUIManager.Render();
+				for (auto f : m_LastToCall)
+					f();
+				m_LastToCall.clear();
+			}
 
 		Renderer::Draw();
 

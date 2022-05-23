@@ -21,7 +21,11 @@ public:
 	}
 };
 
+#if DEBUG
 int main()
+#else
+int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
+#endif
 {
 	Application* app = new Graphy(L"Graphy", 1600U, 900U, 570U, 320U, WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME);
 	app->Run();

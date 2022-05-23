@@ -28,6 +28,7 @@ public:
 
 	void setTextSize(int size) override { m_TextBox->setTextSize(size); }
 	void setText(const std::string& text, TextAnchorFlags flags) override { m_TextBox->setText(text, flags, m_TextBox->m_TextLayout.m_Color); m_Buffer = text; }
+	void setTextColor(const vec3& color) { m_TextBox->setTextColor(color); }
 
 	void setTextAnchor(int flag) { m_Flags = flag; }
 	void setCharacterLimit(int l) { m_CharacterLimit = l; }
